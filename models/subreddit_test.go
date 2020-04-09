@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-func TestGetId(t *testing.T) {
+func TestGetID(t *testing.T) {
 	sub := Subreddit{}
 	data, _ := ioutil.ReadFile("./tests/subreddit.json")
 	json.Unmarshal(data, &sub)
-	if v := sub.GetId(); v != `t5_m0je4` {
+	if v := sub.GetID(); v != `t5_m0je4` {
 		t.Error(
-			"For GetId()",
+			"For GetID()",
 			"expected", `t5_m0je4`,
 			"got", v,
 		)
@@ -45,13 +45,13 @@ func TestGetDisplayName(t *testing.T) {
 	}
 }
 
-func TestGetUrl(t *testing.T) {
+func TestGetURL(t *testing.T) {
 	sub := Subreddit{}
 	data, _ := ioutil.ReadFile("./tests/subreddit.json")
 	json.Unmarshal(data, &sub)
-	if v := sub.GetUrl(); v != `/r/MemeInvestor_bot/` {
+	if v := sub.GetURL(); v != `/r/MemeInvestor_bot/` {
 		t.Error(
-			"For GetUrl()",
+			"For GetURL()",
 			"expected", "/r/MemeInvestor_bot/",
 			"got", v,
 		)

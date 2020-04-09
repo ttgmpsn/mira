@@ -7,7 +7,7 @@ type Subreddit struct {
 
 type SubredditData struct {
 	UserFlairBackgroundColor   string    `json:"user_flair_background_color"`
-	SubmitTextHtml             string    `json:"submit_text_html"`
+	SubmitTextHTML             string    `json:"submit_text_html"`
 	RestrictPosting            bool      `json:"restrict_posting"`
 	UserIsBanned               bool      `json:"user_is_banned"`
 	FreeFormReports            bool      `json:"free_form_reports"`
@@ -34,12 +34,12 @@ type SubredditData struct {
 	PublicDescription          string    `json:"public_description"`
 	CommentScoreHideMins       float64   `json:"comment_score_hide_mins"`
 	UserHasFavorited           bool      `json:"user_has_favorited"`
-	UserFlairTemplateId        string    `json:"user_flair_template_id"`
+	UserFlairTemplateID        string    `json:"user_flair_template_id"`
 	CommunityIcon              string    `json:"community_icon"`
 	BannerBackgroundImage      string    `json:"banner_background_image"`
 	OriginalContentTagEnabled  bool      `json:"original_content_tag_enabled"`
 	SubmitText                 string    `json:"submit_text"`
-	DescriptionHtml            string    `json:"description_html"`
+	DescriptionHTML            string    `json:"description_html"`
 	SpoilersEnabled            bool      `json:"spoilers_enabled"`
 	HeaderTitle                string    `json:"header_title"`
 	HeaderSize                 string    `json:"header_size"`
@@ -60,7 +60,7 @@ type SubredditData struct {
 	UserFlairType              string    `json:"user_flair_type"`
 	CollapseDeletedComments    bool      `json:"collapse_deleted_comments"`
 	EmojisCustomSize           string    `json:"emojis_custom_size"`
-	PublicDescriptionHtml      string    `json:"public_description_html"`
+	PublicDescriptionHTML      string    `json:"public_description_html"`
 	AllowVideos                bool      `json:"allow_videos"`
 	NotificationLevel          string    `json:"notification_level"`
 	CanAssignLinkFlair         bool      `json:"can_assign_link_flair"`
@@ -78,19 +78,19 @@ type SubredditData struct {
 	UserFlairText              string    `json:"user_flair_text"`
 	BannerBackgroundColor      string    `json:"banner_background_color"`
 	ShowMedia                  bool      `json:"show_media"`
-	Id                         string    `json:"id"`
+	ID                         string    `json:"id"`
 	UserIsModerator            bool      `json:"user_is_moderator"`
 	Over18                     bool      `json:"over18"`
 	Description                string    `json:"description"`
 	SubmitLinkLabel            string    `json:"submit_link_label"`
 	UserFlairTextColor         string    `json:"user_flair_text_color"`
 	RestrictCommenting         bool      `json:"restrict_commenting"`
-	UserFlairCssClass          string    `json:"user_flair_css_class"`
+	UserFlairCSSClass          string    `json:"user_flair_css_class"`
 	AllowImages                bool      `json:"allow_images"`
 	Lang                       string    `json:"lang"`
 	WhitelistStatus            string    `json:"whitelist_status"`
-	Url                        string    `json:"url"`
-	CreatedUtc                 float64   `json:"created_utc"`
+	URL                        string    `json:"url"`
+	CreatedUTC                 float64   `json:"created_utc"`
 	BannerSize                 []float64 `json:"banner_size"`
 	MobileBannerImage          string    `json:"mobile_banner_image"`
 	UserIsContributor          bool      `json:"user_is_contributor"`

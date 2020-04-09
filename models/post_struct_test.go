@@ -8,9 +8,9 @@ import (
 
 func BenchmarkCreatePostListing(b *testing.B) {
 	data, _ := ioutil.ReadFile("./tests/postlisting.json")
-	postListingExampleJson := string(data)
+	postListingExampleJSON := string(data)
 	for i := 0; i < b.N; i++ {
 		sub := PostListing{}
-		json.Unmarshal([]byte(postListingExampleJson), &sub)
+		json.Unmarshal([]byte(postListingExampleJSON), &sub)
 	}
 }

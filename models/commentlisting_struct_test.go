@@ -8,9 +8,9 @@ import (
 
 func BenchmarkCreateCommentListing(b *testing.B) {
 	data, _ := ioutil.ReadFile("./tests/commentlisting.json")
-	commentListingExampleJson := string(data)
+	commentListingExampleJSON := string(data)
 	for i := 0; i < b.N; i++ {
 		sub := CommentListing{}
-		json.Unmarshal([]byte(commentListingExampleJson), &sub)
+		json.Unmarshal([]byte(commentListingExampleJSON), &sub)
 	}
 }

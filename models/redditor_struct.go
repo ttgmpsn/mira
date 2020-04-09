@@ -6,26 +6,26 @@ type Redditor struct {
 }
 
 type RedditorData struct {
-	IsEmployee        bool        `json:"is_employee"`
-	IconImg           string      `json:"icon_img"`
-	PrefShowSnoovatar bool        `json:"pref_show_snoovatar"`
-	Name              string      `json:"name"`
-	IsFriend          bool        `json:"is_friend"`
-	Created           float64     `json:"created"`
-	HasSubscribed     bool        `json:"has_subscribed"`
-	HideFromRobots    bool        `json:"hide_from_robots"`
-	CreatedUtc        float64     `json:"created_utc"`
-	LinkKarma         float64     `json:"link_karma"`
-	CommentKarma      float64     `json:"comment_karma"`
-	IsGold            bool        `json:"is_gold"`
-	IsMod             bool        `json:"is_mod"`
-	Verified          bool        `json:"verified"`
-	Subreddit         Subreddit_s `json:"subreddit"`
-	HasVerifiedEmail  bool        `json:"has_verified_email"`
-	Id                string      `json:"id"`
+	IsEmployee        bool       `json:"is_employee"`
+	IconImg           string     `json:"icon_img"`
+	PrefShowSnoovatar bool       `json:"pref_show_snoovatar"`
+	Name              string     `json:"name"`
+	IsFriend          bool       `json:"is_friend"`
+	Created           float64    `json:"created"`
+	HasSubscribed     bool       `json:"has_subscribed"`
+	HideFromRobots    bool       `json:"hide_from_robots"`
+	CreatedUTC        float64    `json:"created_utc"`
+	LinkKarma         float64    `json:"link_karma"`
+	CommentKarma      float64    `json:"comment_karma"`
+	IsGold            bool       `json:"is_gold"`
+	IsMod             bool       `json:"is_mod"`
+	Verified          bool       `json:"verified"`
+	Subreddit         SubredditS `json:"subreddit"`
+	HasVerifiedEmail  bool       `json:"has_verified_email"`
+	ID                string     `json:"id"`
 }
 
-type Subreddit_s struct {
+type SubredditS struct {
 	DefaultSet                 bool      `json:"default_set"`
 	UserIsContributor          bool      `json:"user_is_contributor"`
 	BannerImg                  string    `json:"banner_img"`
@@ -54,7 +54,7 @@ type Subreddit_s struct {
 	KeyColor                   string    `json:"key_color"`
 	Name                       string    `json:"name"`
 	IsDefaultBanner            bool      `json:"is_default_banner"`
-	Url                        string    `json:"url"`
+	URL                        string    `json:"url"`
 	BannerSize                 []float64 `json:"banner_size"`
 	UserIsModerator            bool      `json:"user_is_moderator"`
 	PublicDescription          string    `json:"public_description"`

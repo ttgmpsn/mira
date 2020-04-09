@@ -1,5 +1,5 @@
 package models
 
-func (s *Submission) GetId() string           { return s.Json.Data.Name }
-func (s *Submission) GetDraftsCount() float64 { return s.Json.Data.DraftsCount }
-func (s *Submission) GetUrl() string          { return s.Json.Data.Url }
+func (s *Submission) GetID() string           { return s.JSON.Data.Name }
+func (s *Submission) GetDraftsCount() float64 { return s.JSON.Data.DraftsCount }
+func (s *Submission) GetURL() string          { return s.JSON.Data.URL }

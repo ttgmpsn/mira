@@ -2,8 +2,8 @@ package mira
 
 // Interface can be used for any reddit object (Post, Comment, etc.) to avoid type hinting.
 type Interface interface {
-	GetId() string
-	GetParentId() string
+	GetID() string
+	GetParentID() string
 	GetTitle() string
 	GetBody() string
 	GetAuthor() string
@@ -14,6 +14,6 @@ type Interface interface {
 	GetSubreddit() string
 	GetCreated() float64
 	GetFlair() string
-	GetUrl() string
+	GetURL() string
 	IsRoot() bool
 }

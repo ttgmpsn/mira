@@ -19,7 +19,7 @@ type PostListingChild struct {
 }
 
 type PostListingChildData struct {
-	ApprovedAtUtc              float64            `json:"approved_at_utc"`
+	ApprovedAtUTC              float64            `json:"approved_at_utc"`
 	Subreddit                  string             `json:"subreddit"`
 	Selftext                   string             `json:"selftext"`
 	AuthorFullname             string             `json:"author_fullname"`
@@ -32,7 +32,7 @@ type PostListingChildData struct {
 	SubredditNamePrefixed      string             `json:"subreddit_name_prefixed"`
 	Hidden                     bool               `json:"hidden"`
 	Pwls                       float64            `json:"pwls"`
-	LinkFlairCssClass          string             `json:"link_flair_css_class"`
+	LinkFlairCSSClass          string             `json:"link_flair_css_class"`
 	Downs                      float64            `json:"downs"`
 	ThumbnailHeight            float64            `json:"thumbnail_height"`
 	HideScore                  bool               `json:"hide_score"`
@@ -45,7 +45,7 @@ type PostListingChildData struct {
 	TotalAwardsReceived        float64            `json:"total_awards_received"`
 	MediaEmbed                 []string           `json:"media_embed"`
 	ThumbnailWidth             float64            `json:"thumbnail_width"`
-	AuthorFlairTemplateId      string             `json:"author_flair_template_id"`
+	AuthorFlairTemplateID      string             `json:"author_flair_template_id"`
 	IsOriginalContent          bool               `json:"is_original_content"`
 	UserReports                []string           `json:"user_reports"`
 	SecureMedia                string             `json:"secure_media"`
@@ -59,7 +59,7 @@ type PostListingChildData struct {
 	ApprovedBy                 string             `json:"approved_by"`
 	Thumbnail                  string             `json:"thumbnail"`
 	Edited                     bool               `json:"edited"`
-	AuthorFlairCssClass        string             `json:"author_flair_css_class"`
+	AuthorFlairCSSClass        string             `json:"author_flair_css_class"`
 	AuthorFlairRichtext        []string           `json:"author_flair_richtext"`
 	Gildings                   map[string]float64 `json:"gildings"`
 	PostHint                   string             `json:"post_hint"`
@@ -72,10 +72,10 @@ type PostListingChildData struct {
 	BannedBy                   string             `json:"banned_by"`
 	AuthorFlairType            string             `json:"author_flair_type"`
 	Domain                     string             `json:"domain"`
-	SelftextHtml               string             `json:"selftext_html"`
+	SelftexHTML                string             `json:"selftext_html"`
 	Likes                      float64            `json:"likes"`
 	SuggestedSort              string             `json:"suggested_sort"`
-	BannedAtUtc                float64            `json:"banned_at_utc"`
+	BannedAtUTC                float64            `json:"banned_at_utc"`
 	ViewCount                  float64            `json:"view_count"`
 	Archived                   bool               `json:"archived"`
 	NoFollow                   bool               `json:"no_follow"`
@@ -92,11 +92,11 @@ type PostListingChildData struct {
 	Visited                    bool               `json:"visited"`
 	NumReports                 float64            `json:"num_reports"`
 	Distinguished              bool               `json:"distinguished"`
-	SubredditId                string             `json:"subreddit_id"`
+	SubredditID                string             `json:"subreddit_id"`
 	ModReasonBy                string             `json:"mod_reason_by"`
 	RemovalReason              string             `json:"removal_reason"`
 	LinkFlairBackgroundColor   string             `json:"link_flair_background_color"`
-	Id                         string             `json:"id"`
+	ID                         string             `json:"id"`
 	IsRobotIndexable           bool               `json:"is_robot_indexable"`
 	ReportReasons              string             `json:"report_reasons"`
 	Author                     string             `json:"author"`
@@ -111,9 +111,9 @@ type PostListingChildData struct {
 	Permalink                  string             `json:"permalink"`
 	ParentWhitelistStatus      string             `json:"parent_whitelist_status"`
 	Stickied                   bool               `json:"stickied"`
-	Url                        string             `json:"url"`
+	URL                        string             `json:"url"`
 	SubredditSubscribers       float64            `json:"subreddit_subscribers"`
-	CreatedUtc                 float64            `json:"created_utc"`
+	CreatedUTC                 float64            `json:"created_utc"`
 	Media                      []string           `json:"media"`
 	IsVideo                    bool               `json:"is_video"`
 }
@@ -121,23 +121,23 @@ type PostListingChildData struct {
 type PostAward struct {
 	IsEnabled           bool            `json:"is_enabled"`
 	Count               float64         `json:"count"`
-	SubredditId         string          `json:"subreddit_id"`
+	SubredditID         string          `json:"subreddit_id"`
 	Description         string          `json:"description"`
 	CoinReward          float64         `json:"coin_reward"`
 	IconWidth           float64         `json:"icon_width"`
-	IconUrl             string          `json:"icon_url"`
+	IconURL             string          `json:"icon_url"`
 	DaysOfPremium       float64         `json:"days_of_premium"`
 	IconHeight          float64         `json:"icon_height"`
 	ResizedIcons        []PostAwardIcon `json:"resized_icons"`
 	DaysOfDripExtension float64         `json:"days_of_drip_extension"`
 	AwardType           string          `json:"award_type"`
 	CoinPrice           float64         `json:"coin_price"`
-	Id                  string          `json:"id"`
+	ID                  string          `json:"id"`
 	Name                string          `json:"name"`
 }
 
 type PostAwardIcon struct {
-	Url    string  `json:"url"`
+	URL    string  `json:"url"`
 	Width  float64 `json:"width"`
 	Height float64 `json:"height"`
 }
@@ -151,17 +151,17 @@ type PostPreviewImage struct {
 	Source      PostPreviewImageSource      `json:"source"`
 	Resolutions PostPreviewImageResolutions `json:"resolutions"`
 	Variants    []string                    `json:"variants"`
-	Id          string                      `json:"id"`
+	ID          string                      `json:"id"`
 }
 
 type PostPreviewImageResolutions struct {
-	Url    string  `json:"url"`
+	URL    string  `json:"url"`
 	Width  float64 `json:"width"`
 	Height float64 `json:"height"`
 }
 
 type PostPreviewImageSource struct {
-	Url    string  `json:"url"`
+	URL    string  `json:"url"`
 	Width  float64 `json:"width"`
 	Height float64 `json:"height"`
 }

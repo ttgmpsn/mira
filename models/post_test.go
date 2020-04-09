@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-func TestGetPostListingId(t *testing.T) {
+func TestGetPostListingID(t *testing.T) {
 	post := PostListing{}
 	data, _ := ioutil.ReadFile("./tests/postlisting.json")
 	json.Unmarshal(data, &post)
-	if v := post.GetChildren()[0].GetId(); v != `t3_bev1v7` {
+	if v := post.GetChildren()[0].GetID(); v != `t3_bev1v7` {
 		t.Error(
-			"For GetId()",
+			"For GetID()",
 			"expected", `t3_bev1v7`,
 			"got", v,
 		)

@@ -1,40 +1,40 @@
 package models
 
 type CommentWrap struct {
-	Json CommentJson `json:"json"`
+	JSON CommentJSON `json:"json"`
 }
 
-type CommentJson struct {
+type CommentJSON struct {
 	Errors []string        `json:"errors"`
-	Data   CommentJsonData `json:"data"`
+	Data   CommentJSONData `json:"data"`
 }
 
-type CommentJsonData struct {
-	Things []CommentJsonDataThing `json:"things"`
+type CommentJSONData struct {
+	Things []CommentJSONDataThing `json:"things"`
 }
 
-type CommentJsonDataThing struct {
+type CommentJSONDataThing struct {
 	Kind string                   `json:"kind"`
-	Data CommentJsonDataThingData `json:"data"`
+	Data CommentJSONDataThingData `json:"data"`
 }
 
-type CommentJsonDataThingData struct {
+type CommentJSONDataThingData struct {
 	AuthorFlairBackgroundColor string   `json:"author_flair_background_color"`
 	TotalAwardsReceived        float64  `json:"total_awards_received"`
-	ApprovedAtUtc              string   `json:"approved_at_utc"`
+	ApprovedAtUTC              string   `json:"approved_at_utc"`
 	Distinguished              string   `json:"distinguished"`
 	ModReasonBy                string   `json:"mod_reason_by"`
 	BannedBy                   string   `json:"banned_by"`
 	AuthorFlairType            string   `json:"author_flair_type"`
 	RemovalReason              string   `json:"removal_reason"`
-	LinkId                     string   `json:"link_id"`
-	AuthorFlairTemplateId      string   `json:"author_flair_template_id"`
+	LinkID                     string   `json:"link_id"`
+	AuthorFlairTemplateID      string   `json:"author_flair_template_id"`
 	Likes                      bool     `json:"likes"`
 	Replies                    string   `json:"replies"`
 	UserReports                []string `json:"user_reports"`
 	Saved                      bool     `json:"saved"`
-	Id                         string   `json:"id"`
-	BannedAtUtc                string   `json:"banned_at_utc"`
+	ID                         string   `json:"id"`
+	BannedAtUTC                string   `json:"banned_at_utc"`
 	ModReasonTitle             string   `json:"mod_reason_title"`
 	Gilded                     float64  `json:"gilded"`
 	Archived                   bool     `json:"archived"`
@@ -42,26 +42,26 @@ type CommentJsonDataThingData struct {
 	Author                     string   `json:"author"`
 	RteMode                    string   `json:"rte_mode"`
 	CanModPost                 bool     `json:"can_mod_post"`
-	CreatedUtc                 float64  `json:"created_utc"`
+	CreatedUTC                 float64  `json:"created_utc"`
 	SendReplies                bool     `json:"send_replies"`
-	ParentId                   string   `json:"parent_id"`
+	ParentID                   string   `json:"parent_id"`
 	Score                      float64  `json:"score"`
 	AuthorFullname             string   `json:"author_fullname"`
 	ApprovedBy                 string   `json:"approved_by"`
-	Mod_note                   string   `json:"mod_note"`
+	ModNote                    string   `json:"mod_note"`
 	AllAwardings               []string `json:"all_awardings"`
-	SubredditId                string   `json:"subreddit_id"`
+	SubredditID                string   `json:"subreddit_id"`
 	Body                       string   `json:"body"`
 	Edited                     bool     `json:"edited"`
 	Gildings                   Gilding  `json:"gildings"`
-	AuthorFlairCssClass        string   `json:"author_flair_css_class"`
+	AuthorFlairCSSClass        string   `json:"author_flair_css_class"`
 	Name                       string   `json:"name"`
 	AuthorPatreonFlair         bool     `json:"author_patreon_flair"`
 	Downs                      float64  `json:"downs"`
 	AuthorFlairRichtext        []string `json:"author_flair_richtext"`
 	IsSubmitter                bool     `json:"is_submitter"`
 	CollapsedReason            string   `json:"collapsed_reason"`
-	BodyHtml                   string   `json:"body_html"`
+	BodyHTML                   string   `json:"body_html"`
 	Stickied                   bool     `json:"stickied"`
 	CanGild                    bool     `json:"can_gild"`
 	Removed                    bool     `json:"removed"`

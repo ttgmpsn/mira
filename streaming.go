@@ -3,7 +3,7 @@ package mira
 import (
 	"time"
 
-	"github.com/thecsw/mira/models"
+	"github.com/ttgmpsn/mira/models"
 )
 
 // StreamCommentReplies streams replies to your comments, taken form the DMs.
@@ -20,7 +20,7 @@ func (r *Reddit) StreamCommentReplies() <-chan models.Comment {
 					// mark them as read.
 					c <- v
 					// You can read the message with
-					r.Me().ReadMessage(v.GetId())
+					r.Me().ReadMessage(v.GetID())
 				}
 			}
 			time.Sleep(r.Stream.CommentListInterval * time.Second)
@@ -43,7 +43,7 @@ func (r *Reddit) StreamMentions() <-chan models.Comment {
 					// mark them as read.
 					c <- v
 					// You can read the message with
-					r.Me().ReadMessage(v.GetId())
+					r.Me().ReadMessage(v.GetID())
 				}
 			}
 			time.Sleep(r.Stream.CommentListInterval * time.Second)
@@ -78,7 +78,7 @@ func (r *Reddit) streamSubredditComments(subreddit string) (<-chan models.Commen
 	}
 	last := ""
 	if len(anchor) > 0 {
-		last = anchor[0].GetId()
+		last = anchor[0].GetID()
 	}
 	go func() {
 		for {
@@ -87,7 +87,7 @@ func (r *Reddit) streamSubredditComments(subreddit string) (<-chan models.Commen
 				time.Sleep(r.Stream.CommentListInterval * time.Second)
 				continue
 			}
-			last = un[0].GetId()
+			last = un[0].GetID()
 			for _, v := range un {
 				c <- v
 			}
@@ -105,7 +105,7 @@ func (r *Reddit) streamRedditorComments(redditor string) (<-chan models.Comment,
 	}
 	last := ""
 	if len(anchor) > 0 {
-		last = anchor[0].GetId()
+		last = anchor[0].GetID()
 	}
 	go func() {
 		for {
@@ -114,7 +114,7 @@ func (r *Reddit) streamRedditorComments(redditor string) (<-chan models.Comment,
 				time.Sleep(r.Stream.CommentListInterval * time.Second)
 				continue
 			}
-			last = un[0].GetId()
+			last = un[0].GetID()
 			for _, v := range un {
 				c <- v
 			}
@@ -148,7 +148,7 @@ func (r *Reddit) streamSubredditSubmissions(subreddit string) (<-chan models.Pos
 	}
 	last := ""
 	if len(anchor) > 0 {
-		last = anchor[0].GetId()
+		last = anchor[0].GetID()
 	}
 	go func() {
 		for {
@@ -157,7 +157,7 @@ func (r *Reddit) streamSubredditSubmissions(subreddit string) (<-chan models.Pos
 				time.Sleep(r.Stream.PostListInterval * time.Second)
 				continue
 			}
-			last = new[0].GetId()
+			last = new[0].GetID()
 			for i := range new {
 				c <- new[len(new)-i-1]
 			}
@@ -175,7 +175,7 @@ func (r *Reddit) streamRedditorSubmissions(redditor string) (<-chan models.PostL
 	}
 	last := ""
 	if len(anchor) > 0 {
-		last = anchor[0].GetId()
+		last = anchor[0].GetID()
 	}
 	go func() {
 		for {
@@ -184,7 +184,7 @@ func (r *Reddit) streamRedditorSubmissions(redditor string) (<-chan models.PostL
 				time.Sleep(r.Stream.PostListInterval * time.Second)
 				continue
 			}
-			last = new[0].GetId()
+			last = new[0].GetID()
 			for i := range new {
 				c <- new[len(new)-i-1]
 			}

@@ -1,17 +1,17 @@
 package models
 
 type Submission struct {
-	Json SubmissionJson `json:"json"`
+	JSON SubmissionJSON `json:"json"`
 }
 
-type SubmissionJson struct {
+type SubmissionJSON struct {
 	Errors []string           `json:"errors"`
-	Data   SubmissionJsonData `json:"data"`
+	Data   SubmissionJSONData `json:"data"`
 }
 
-type SubmissionJsonData struct {
-	Url         string  `json:"url"`
+type SubmissionJSONData struct {
+	URL         string  `json:"url"`
 	DraftsCount float64 `json:"drafts_count"`
-	Id          string  `json:"id"`
+	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 }

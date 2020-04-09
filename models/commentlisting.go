@@ -1,9 +1,9 @@
 package models
 
 func (l *CommentListing) GetChildren() []Comment { return l.Data.Children }
-func (ldc Comment) GetId() string                { return ldc.Data.Name }
-func (ldc Comment) GetParentId() string          { return ldc.Data.ParentId }
-func (ldc Comment) IsRoot() bool                 { return string(ldc.Data.ParentId[1]) == "3" }
+func (ldc Comment) GetID() string                { return ldc.Data.Name }
+func (ldc Comment) GetParentID() string          { return ldc.Data.ParentID }
+func (ldc Comment) IsRoot() bool                 { return string(ldc.Data.ParentID[1]) == "3" }
 func (ldc Comment) GetTitle() string             { return ldc.Data.Body }
 func (ldc Comment) GetBody() string              { return ldc.Data.Body }
 func (ldc Comment) GetSubreddit() string         { return ldc.Data.Subreddit }
@@ -16,5 +16,5 @@ func (ldc Comment) IsCommentReply() bool         { return ldc.Data.Subject == "c
 func (ldc Comment) IsMention() bool              { return ldc.Data.Subject == "username mention" }
 func (ldc Comment) GetName() string              { return ldc.Data.Name }
 func (ldc Comment) GetKarma() float64            { return ldc.Data.Score }
-func (ldc Comment) GetUrl() string               { return ldc.Data.Permalink }
+func (ldc Comment) GetURL() string               { return ldc.Data.Permalink }
 func (ldc Comment) GetFlair() string             { return ldc.Data.Context }

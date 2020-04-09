@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/thecsw/mira/models"
+	"github.com/ttgmpsn/mira/models"
 )
 
 var (
@@ -195,7 +195,7 @@ func (c *Reddit) ExtractSubmission() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	link := info.GetUrl()
+	link := info.GetURL()
 	reg := regexp.MustCompile(`comments/([^/]+)/`)
 	res := reg.FindStringSubmatch(link)
 	if len(res) < 1 {
@@ -253,7 +253,7 @@ func (c *Reddit) Root() (string, error) {
 		if len(temp.Data.Children) < 1 {
 			return "", errors.New("could not find the requested comment")
 		}
-		current = temp.Data.Children[0].GetParentId()
+		current = temp.Data.Children[0].GetParentID()
 		tries++
 		if tries > c.Values.GetSubmissionFromCommentTries {
 			return "", fmt.Errorf("Exceeded the maximum number of iterations: %v", c.Values.GetSubmissionFromCommentTries)
