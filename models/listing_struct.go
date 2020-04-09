@@ -44,6 +44,8 @@ func (r *RedditElement) UnmarshalJSON(data []byte) error {
 		r.Data = &Subreddit{}
 	//case KAward:
 	// not implemented
+	case KModAction:
+		r.Data = &ModAction{}
 	default:
 		return fmt.Errorf("%q is an invalid RedditKind", m.Kind)
 	}

@@ -46,3 +46,9 @@ func (c Comment) IsAuthor() bool { return c.IsSubmitter }
 
 // GetURL returns the link to the Comment
 func (c Comment) GetURL() string { return fmt.Sprintf("https://www.reddit.com%s", c.Permalink) }
+
+// GetBannedBy returns the user who deleted the Comment
+func (c Comment) GetBannedBy() string { return c.BannedBy }
+
+// GetNumReports returns the report count for the Comment
+func (c Comment) GetNumReports() uint { return c.NumReports }

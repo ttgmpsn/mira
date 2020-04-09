@@ -162,6 +162,31 @@ func (c *Reddit) Info() (models.RedditThing, error) {
 	}
 }
 
+// SubmissionInfo returns general information about the queued submission.
+func (c *Reddit) SubmissionInfo() (models.Submission, error) {
+	name, ttype := c.getQueue()
+	switch ttype {
+	case models.KPost:
+		return c.getPost(models.RedditID(name))
+	case models.KComment:
+		return c.getComment(models.RedditID(name))
+	default:
+		return nil, fmt.Errorf("returning type is not defined")
+	}
+}
+
+// SubmissionInfoID returns general information about the submission ID.
+func (c *Reddit) SubmissionInfoID(name models.RedditID) (models.Submission, error) {
+	switch name.Type() {
+	case models.KPost:
+		return c.getPost(name)
+	case models.KComment:
+		return c.getComment(name)
+	default:
+		return nil, fmt.Errorf("returning type is not defined")
+	}
+}
+
 func (c *Reddit) getMe() (*models.Me, error) {
 	target := RedditOauth + "/api/v1/me"
 	ans, err := c.MiraRequest("GET", target, nil)

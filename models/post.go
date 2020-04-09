@@ -43,3 +43,9 @@ func (p Post) GetTitle() string { return p.Title }
 
 // GetURL returns the link to the Post
 func (p Post) GetURL() string { return p.URL }
+
+// GetBannedBy returns the user who deleted the Post
+func (p Post) GetBannedBy() string { return p.BannedBy }
+
+// GetNumReports returns the report count for the Post
+func (p Post) GetNumReports() uint { return p.NumReports }

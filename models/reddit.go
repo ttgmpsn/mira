@@ -20,6 +20,7 @@ const (
 	KMessage   RedditKind = "t4"
 	KSubreddit RedditKind = "t5"
 	KAward     RedditKind = "t6"
+	KModAction RedditKind = "modaction"
 	KUnknown   RedditKind = "tX"
 )
 
@@ -38,6 +39,8 @@ func (id RedditID) Type() RedditKind {
 		return KSubreddit
 	case "t6_":
 		return KAward
+	case "modaction":
+		return KModAction
 	default:
 		return KUnknown
 	}
@@ -102,7 +105,9 @@ type Submission interface {
 	GetBody() string
 	GetScore() int
 	IsSticky() bool
+	// Mod Stuff
 	IsRemoved() bool
 	IsApproved() bool
-	IsAuthor() bool
+	GetBannedBy() string
+	GetNumReports() uint
 }
