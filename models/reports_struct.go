@@ -2,11 +2,13 @@ package models
 
 import "encoding/json"
 
+// UserReport is a submission report from a user
 type UserReport struct {
 	Reason string
 	Count  int
 }
 
+// UnmarshalJSON helps to get UserReport directly from JSON
 func (ur *UserReport) UnmarshalJSON(data []byte) error {
 	var v []interface{}
 
@@ -20,11 +22,14 @@ func (ur *UserReport) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// ModReport is a submission report from a mod.
+// Unlike UserReport, this includes the name of the mod
 type ModReport struct {
 	Reason string
 	Mod    string
 }
 
+// UnmarshalJSON helps to get ModReport directly from JSON
 func (mr *ModReport) UnmarshalJSON(data []byte) error {
 	var v []interface{}
 

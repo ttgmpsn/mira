@@ -3,6 +3,8 @@ package mira
 import (
 	"net/http"
 	"time"
+
+	"github.com/ttgmpsn/mira/models"
 )
 
 // Reddit holds the connection to the API for a user
@@ -30,5 +32,5 @@ type RedditVals struct {
 
 type chainVals struct {
 	Name string
-	Type string
+	Type models.RedditKind
 }

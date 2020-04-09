@@ -1,23 +1,48 @@
 package models
 
-func (c CommentWrap) getThing() CommentJSONDataThing {
-	if len(c.JSON.Data.Things) > 0 {
-		return c.JSON.Data.Things[0]
-	}
-	return CommentJSONDataThing{}
-}
-func (c CommentWrap) GetID() string          { return c.getThing().Data.Name }
-func (c CommentWrap) GetSubredditID() string { return c.getThing().Data.SubredditID }
-func (c CommentWrap) GetParentID() string    { return c.getThing().Data.ParentID }
-func (c CommentWrap) GetAuthor() string      { return c.getThing().Data.Author }
-func (c CommentWrap) GetAuthorID() string    { return c.getThing().Data.AuthorFullname }
-func (c CommentWrap) GetSubreddit() string   { return c.getThing().Data.Subreddit }
-func (c CommentWrap) CreatedAt() float64     { return c.getThing().Data.CreatedUTC }
-func (c CommentWrap) GetBody() string        { return c.getThing().Data.Body }
-func (c CommentWrap) GetScore() float64      { return c.getThing().Data.Score }
-func (c CommentWrap) GetUps() float64        { return c.getThing().Data.Ups }
-func (c CommentWrap) GetDowns() float64      { return c.getThing().Data.Downs }
-func (c CommentWrap) IsSticky() bool         { return c.getThing().Data.Stickied }
-func (c CommentWrap) IsRemoved() bool        { return c.getThing().Data.Removed }
-func (c CommentWrap) IsApproved() bool       { return c.getThing().Data.Approved }
-func (c CommentWrap) IsAuthor() bool         { return c.getThing().Data.IsSubmitter }
+import (
+	"fmt"
+	"time"
+)
+
+// GetID returns the RedditID of the Comment
+func (c Comment) GetID() RedditID { return c.Name }
+
+// GetSubreddit returns the name of the Subreddit the comment was posted in
+func (c Comment) GetSubreddit() string { return c.Subreddit }
+
+// GetSubredditID returns the RedditID of the subreddit the comment was posted in
+func (c Comment) GetSubredditID() RedditID { return c.SubredditID }
+
+// GetParentID returns the parent RedditID of the Comment
+func (c Comment) GetParentID() RedditID { return c.ParentID }
+
+// GetAuthor returns the name of the Comment Author
+func (c Comment) GetAuthor() string { return c.Author }
+
+// GetAuthorID returns the RedditID of the Comment Author
+func (c Comment) GetAuthorID() RedditID { return c.AuthorFullname }
+
+// CreatedAt returns the time.Time the post was created at
+func (c Comment) CreatedAt() time.Time { return time.Unix(c.CreatedUTC, 0) }
+
+// GetBody returns the content of the Comment in Markdown
+func (c Comment) GetBody() string { return c.Body }
+
+// GetScore returns the current score of the Comment
+func (c Comment) GetScore() int { return c.Score }
+
+// IsSticky tells you if the comment has been stickied
+func (c Comment) IsSticky() bool { return c.Stickied }
+
+// IsRemoved tells you if the comment has been removed (only if you are mod)
+func (c Comment) IsRemoved() bool { return c.Removed }
+
+// IsApproved tells you if the comment has been approved (only if you are mod)
+func (c Comment) IsApproved() bool { return c.Approved }
+
+// IsAuthor tells you if the comment has been made by OP
+func (c Comment) IsAuthor() bool { return c.IsSubmitter }
+
+// GetURL returns the link to the Comment
+func (c Comment) GetURL() string { return fmt.Sprintf("https://www.reddit.com%s", c.Permalink) }

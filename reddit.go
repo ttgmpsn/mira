@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -50,6 +49,22 @@ func (c *Reddit) MiraRequest(method string, target string, payload map[string]st
 	return data, nil
 }
 
+func (c *Reddit) miraRequestListing(method string, target string, payload map[string]string) (*models.Listing, error) {
+	ans, err := c.MiraRequest(method, target, payload)
+	if err != nil {
+		return nil, err
+	}
+	ret := &models.Response{}
+	if err := json.Unmarshal([]byte(ans), ret); err != nil {
+		return nil, err
+	}
+	list, ok := ret.Data.(*models.Listing)
+	if !ok {
+		return nil, fmt.Errorf("couldn't convert to Listing struct. Data has Kind '%s'", ret.Kind)
+	}
+	return list, nil
+}
+
 // Me Redditor queues up the next action to be about the logged in user.
 func (c *Reddit) Me() *Reddit {
 	c.addQueue(c.Creds.Username, "me")
@@ -58,70 +73,70 @@ func (c *Reddit) Me() *Reddit {
 
 // Subreddit Redditor queues up the next action to be about one or multuple Subreddits.
 func (c *Reddit) Subreddit(name ...string) *Reddit {
-	c.addQueue(strings.Join(name, "+"), "subreddit")
+	c.addQueue(strings.Join(name, "+"), models.KSubreddit)
 	return c
 }
 
-// Submission queues up the next action to be about a certain Submission.
-func (c *Reddit) Submission(name string) *Reddit {
-	c.addQueue(name, "submission")
+// Post queues up the next action to be about a certain Post.
+func (c *Reddit) Post(name string) *Reddit {
+	c.addQueue(name, models.KPost)
 	return c
 }
 
 // Comment queues up the next action to be about a certain comment.
 func (c *Reddit) Comment(name string) *Reddit {
-	c.addQueue(name, "comment")
+	c.addQueue(name, models.KComment)
 	return c
 }
 
 // Redditor queues up the next action to be about a certain Redditor.
 func (c *Reddit) Redditor(name string) *Reddit {
-	c.addQueue(name, "redditor")
+	c.addQueue(name, models.KRedditor)
 	return c
 }
 
-// Submissions gets submissions for the last queued object.
+// Posts gets posts for the last queued object.
 // Valid objects: Subreddit, Redditor
-func (c *Reddit) Submissions(sort string, tdur string, limit int) ([]models.PostListingChild, error) {
+func (c *Reddit) Posts(sort string, tdur string, limit int) ([]*models.Post, error) {
 	name, ttype := c.getQueue()
 	switch ttype {
-	case "subreddit":
+	case models.KSubreddit:
 		return c.getSubredditPosts(name, sort, tdur, limit)
-	case "redditor":
+	case models.KRedditor:
 		return c.getRedditorPosts(name, sort, tdur, limit)
 	default:
-		return nil, fmt.Errorf("'%s' type does not have an option for submissions", ttype)
+		return nil, fmt.Errorf("'%s' type does not have an option for posts", ttype)
 	}
 }
 
-// SubmissionsAfter gets submissions for the last queued object after a given item.
+// PostsAfter gets posts for the last queued object after a given item.
 // Valid objects: Subreddit, Redditor
-func (c *Reddit) SubmissionsAfter(last string, limit int) ([]models.PostListingChild, error) {
+func (c *Reddit) PostsAfter(last string, limit int) ([]*models.Post, error) {
 	name, ttype := c.getQueue()
 	switch ttype {
-	case "subreddit":
+	case models.KSubreddit:
 		return c.getSubredditPostsAfter(name, last, limit)
-	case "redditor":
+	case models.KRedditor:
 		return c.getRedditorPostsAfter(name, last, limit)
 	default:
-		return nil, fmt.Errorf("'%s' type does not have an option for submissions", ttype)
+		return nil, fmt.Errorf("'%s' type does not have an option for postsafter", ttype)
 	}
 }
 
 // Comments gets comments for the last queued object.
-// Valid objects: Subreddit, Submission, Redditor
-func (c *Reddit) Comments(sort string, tdur string, limit int) ([]models.Comment, error) {
+// Valid objects: Subreddit, Post, Redditor
+func (c *Reddit) Comments(sort string, tdur string, limit int) ([]*models.Comment, error) {
 	name, ttype := c.getQueue()
 	switch ttype {
-	case "subreddit":
+	case models.KSubreddit:
 		return c.getSubredditComments(name, sort, tdur, limit)
-	case "submission":
-		comments, _, err := c.getSubmissionComments(name, sort, tdur, limit)
+	case models.KPost:
+		comments, err := c.getPostComments(models.RedditID(name), sort, tdur, limit)
 		if err != nil {
 			return nil, err
 		}
 		return comments, nil
-	case "redditor":
+	case models.KRedditor:
 		return c.getRedditorComments(name, sort, tdur, limit)
 	default:
 		return nil, fmt.Errorf("'%s' type does not have an option for comments", ttype)
@@ -129,175 +144,165 @@ func (c *Reddit) Comments(sort string, tdur string, limit int) ([]models.Comment
 }
 
 // Info returns general information about the queued object as a mira.Interface.
-func (c *Reddit) Info() (Interface, error) {
+func (c *Reddit) Info() (models.RedditThing, error) {
 	name, ttype := c.getQueue()
 	switch ttype {
 	case "me":
 		return c.getMe()
-	case "submission":
-		return c.getSubmission(name)
-	case "comment":
-		return c.getComment(name)
-	case "subreddit":
+	case models.KPost:
+		return c.getPost(models.RedditID(name))
+	case models.KComment:
+		return c.getComment(models.RedditID(name))
+	case models.KSubreddit:
 		return c.getSubreddit(name)
-	case "redditor":
+	case models.KRedditor:
 		return c.getUser(name)
 	default:
 		return nil, fmt.Errorf("returning type is not defined")
 	}
 }
 
-func (c *Reddit) getMe() (models.Me, error) {
+func (c *Reddit) getMe() (*models.Me, error) {
 	target := RedditOauth + "/api/v1/me"
-	ret := &models.Me{}
 	ans, err := c.MiraRequest("GET", target, nil)
 	if err != nil {
-		return *ret, err
+		return nil, err
 	}
-	json.Unmarshal(ans, ret)
-	return *ret, nil
+	ret := &models.Me{}
+	if err := json.Unmarshal([]byte(ans), ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
 
-func (c *Reddit) getSubmission(id string) (models.PostListingChild, error) {
+func (c *Reddit) getPost(id models.RedditID) (*models.Post, error) {
 	target := RedditOauth + "/api/info.json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
-		"id": id,
+	list, err := c.miraRequestListing("GET", target, map[string]string{
+		"id": string(id),
 	})
-	ret := &models.PostListing{}
-	json.Unmarshal(ans, ret)
-	if len(ret.GetChildren()) < 1 {
-		return models.PostListingChild{}, fmt.Errorf("id not found")
+	if err != nil {
+		return nil, err
 	}
-	return ret.GetChildren()[0], err
+
+	if len(list.Children) < 1 {
+		return nil, fmt.Errorf("no results")
+	}
+
+	post, ok := list.Children[0].Data.(*models.Post)
+	if !ok {
+		return nil, fmt.Errorf("provided ID '%s' is no valid post", id)
+	}
+
+	return post, nil
 }
 
-func (c *Reddit) getComment(id string) (models.Comment, error) {
+func (c *Reddit) getComment(id models.RedditID) (*models.Comment, error) {
 	target := RedditOauth + "/api/info.json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
-		"id": id,
+	list, err := c.miraRequestListing("GET", target, map[string]string{
+		"id": string(id),
 	})
-	ret := &models.CommentListing{}
-	json.Unmarshal(ans, ret)
-	if len(ret.GetChildren()) < 1 {
-		return models.Comment{}, fmt.Errorf("id not found")
+	if err != nil {
+		return nil, err
 	}
-	return ret.GetChildren()[0], err
+
+	if len(list.Children) < 1 {
+		return nil, fmt.Errorf("no results")
+	}
+
+	comment, ok := list.Children[0].Data.(*models.Comment)
+	if !ok {
+		return nil, fmt.Errorf("provided ID '%s' is no valid comment", id)
+	}
+
+	return comment, nil
 }
 
-// ExtractSubmission returns the Submission ID for the last queued object.
+// GetParentPost returns the Post ID for the last queued object.
 // Valid objects: Comment
-func (c *Reddit) ExtractSubmission() (string, error) {
-	name, _, err := c.checkType("comment")
+func (c *Reddit) GetParentPost() (models.RedditID, error) {
+	name, _, err := c.checkType(models.KComment)
 	if err != nil {
 		return "", err
 	}
-	info, err := c.Comment(name).Info()
+	info, err := c.getComment(models.RedditID(name))
 	if err != nil {
 		return "", err
 	}
-	link := info.GetURL()
-	reg := regexp.MustCompile(`comments/([^/]+)/`)
-	res := reg.FindStringSubmatch(link)
-	if len(res) < 1 {
-		return "", errors.New("couldn't extract submission id")
-	}
-	return "t3_" + res[1], nil
+	return info.LinkID, nil
 }
 
-// Root will return the submission id of a comment
-//
-// Comment id has form of t1_... where submission is prefixed with t3_...
-//
-// Comment structures in themselves do not have submission id included,
-// they only have a parent_id field that points to a parent comment or a
-// submission. If it does not point directly at the submission, we need to
-// make iterative calls until we bump into an id that fits the submission
-// prefix. It may take several calls.
-//
-// For example:
-//
-// - If comment is first-level, we make one call to get the object and
-// extract the submission id. If you already have a Go struct at hand,
-// please just invoke .GetParentId() to get the parent id
-//
-// - If comment is second-level, it would take two calls to extact the
-// submission id. If you want to save a call, you can pass a parent_id
-// instead that would take 1 call instead of 2.
-//
-// - If comment is N-level, it would take N calls. If you aleady have an
-// object, just pass in its object, so it would take N-1 calls.
-//
-// NOTE: If any error occurs, the method will return on error object.
-// If it takes more than 12 calls, the function bails out.
-func (c *Reddit) Root() (string, error) {
-	name, _, err := c.checkType("comment")
-	if err != nil {
-		return "", err
-	}
-	current := name
-	// Not a comment passed
-	if string(current[1]) != "1" {
-		return "", errors.New("the passed ID is not a comment")
-	}
-	target := RedditOauth + "/api/info.json"
-	temp := models.CommentListing{}
-	tries := 0
-	for string(current[1]) != "3" {
-		ans, err := c.MiraRequest("GET", target, map[string]string{
-			"id": current,
-		})
-		if err != nil {
-			return "", err
-		}
-		json.Unmarshal(ans, &temp)
-		if len(temp.Data.Children) < 1 {
-			return "", errors.New("could not find the requested comment")
-		}
-		current = temp.Data.Children[0].GetParentID()
-		tries++
-		if tries > c.Values.GetSubmissionFromCommentTries {
-			return "", fmt.Errorf("Exceeded the maximum number of iterations: %v", c.Values.GetSubmissionFromCommentTries)
-		}
-	}
-	return current, nil
-}
-
-func (c *Reddit) getUser(name string) (models.Redditor, error) {
+func (c *Reddit) getUser(name string) (*models.Redditor, error) {
 	target := RedditOauth + "/user/" + name + "/about"
 	ans, err := c.MiraRequest("GET", target, nil)
-	ret := &models.Redditor{}
-	json.Unmarshal(ans, ret)
-	return *ret, err
+	if err != nil {
+		return nil, err
+	}
+	ret := &models.RedditElement{}
+	if err := json.Unmarshal([]byte(ans), ret); err != nil {
+		return nil, err
+	}
+	user, ok := ret.Data.(*models.Redditor)
+	if !ok {
+		return nil, fmt.Errorf("couldn't convert to Redditor struct. Data has Kind '%s'", ret.Kind)
+	}
+	return user, nil
 }
 
-func (c *Reddit) getSubreddit(name string) (models.Subreddit, error) {
+func (c *Reddit) getSubreddit(name string) (*models.Subreddit, error) {
 	target := RedditOauth + "/r/" + name + "/about"
 	ans, err := c.MiraRequest("GET", target, nil)
-	ret := &models.Subreddit{}
-	json.Unmarshal(ans, ret)
-	return *ret, err
+	if err != nil {
+		return nil, err
+	}
+	ret := &models.RedditElement{}
+	if err := json.Unmarshal([]byte(ans), ret); err != nil {
+		return nil, err
+	}
+	sub, ok := ret.Data.(*models.Subreddit)
+	if !ok {
+		return nil, fmt.Errorf("couldn't convert to Subreddit struct. Data has Kind '%s'", ret.Kind)
+	}
+	return sub, nil
 }
 
-func (c *Reddit) getRedditorPosts(user string, sort string, tdur string, limit int) ([]models.PostListingChild, error) {
+func (c *Reddit) getRedditorPosts(user string, sort string, tdur string, limit int) ([]*models.Post, error) {
 	target := RedditOauth + "/u/" + user + "/submitted/" + sort + ".json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
+	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"limit": strconv.Itoa(limit),
 		"t":     tdur,
 	})
-	ret := &models.PostListing{}
-	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*models.Post{}
+	for _, post := range list.Children {
+		if p, ok := post.Data.(*models.Post); ok {
+			ret = append(ret, p)
+		}
+	}
+
+	return ret, nil
 }
 
-func (c *Reddit) getRedditorPostsAfter(user string, last string, limit int) ([]models.PostListingChild, error) {
+func (c *Reddit) getRedditorPostsAfter(user string, last string, limit int) ([]*models.Post, error) {
 	target := RedditOauth + "/u/" + user + "/submitted/new.json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
+	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"limit":  strconv.Itoa(limit),
 		"before": last,
 	})
-	ret := &models.PostListing{}
-	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*models.Post{}
+	for _, post := range list.Children {
+		if p, ok := post.Data.(*models.Post); ok {
+			ret = append(ret, p)
+		}
+	}
+
+	return ret, nil
 }
 
 // Get submisssions from a subreddit up to a specified limit sorted by the given parameter
@@ -307,58 +312,94 @@ func (c *Reddit) getRedditorPostsAfter(user string, last string, limit int) ([]m
 // Time options: "all", "year", "month", "week", "day", "hour"
 //
 // Limit is any numerical value, so 0 <= limit <= 100
-func (c *Reddit) getSubredditPosts(sr string, sort string, tdur string, limit int) ([]models.PostListingChild, error) {
+func (c *Reddit) getSubredditPosts(sr string, sort string, tdur string, limit int) ([]*models.Post, error) {
 	target := RedditOauth + "/r/" + sr + "/" + sort + ".json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
+	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"limit": strconv.Itoa(limit),
 		"t":     tdur,
 	})
-	ret := &models.PostListing{}
-	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*models.Post{}
+	for _, post := range list.Children {
+		if p, ok := post.Data.(*models.Post); ok {
+			ret = append(ret, p)
+		}
+	}
+
+	return ret, nil
 }
 
-func (c *Reddit) getSubredditComments(sr string, sort string, tdur string, limit int) ([]models.Comment, error) {
+func (c *Reddit) getSubredditComments(sr string, sort string, tdur string, limit int) ([]*models.Comment, error) {
 	target := RedditOauth + "/r/" + sr + "/comments.json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
+	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"sort":  sort,
 		"limit": strconv.Itoa(limit),
 		"t":     tdur,
 	})
-	ret := &models.CommentListing{}
-	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*models.Comment{}
+	for _, comment := range list.Children {
+		if c, ok := comment.Data.(*models.Comment); ok {
+			ret = append(ret, c)
+		}
+	}
+
+	return ret, nil
 }
 
-func (c *Reddit) getRedditorComments(user string, sort string, tdur string, limit int) ([]models.Comment, error) {
+func (c *Reddit) getRedditorComments(user string, sort string, tdur string, limit int) ([]*models.Comment, error) {
 	target := RedditOauth + "/u/" + user + "/comments.json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
+	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"sort":  sort,
 		"limit": strconv.Itoa(limit),
 		"t":     tdur,
 	})
-	ret := &models.CommentListing{}
-	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*models.Comment{}
+	for _, comment := range list.Children {
+		if c, ok := comment.Data.(*models.Comment); ok {
+			ret = append(ret, c)
+		}
+	}
+
+	return ret, nil
 }
 
-func (c *Reddit) getRedditorCommentsAfter(user string, sort string, last string, limit int) ([]models.Comment, error) {
+func (c *Reddit) getRedditorCommentsAfter(user string, sort string, last string, limit int) ([]*models.Comment, error) {
 	target := RedditOauth + "/u/" + user + "/comments.json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
+	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"sort":   sort,
 		"limit":  strconv.Itoa(limit),
 		"before": last,
 	})
-	ret := &models.CommentListing{}
-	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*models.Comment{}
+	for _, comment := range list.Children {
+		if c, ok := comment.Data.(*models.Comment); ok {
+			ret = append(ret, c)
+		}
+	}
+
+	return ret, nil
 }
 
-func (c *Reddit) getSubmissionComments(postID string, sort string, tdur string, limit int) ([]models.Comment, []string, error) {
-	if !strings.HasPrefix(postID, "t3_") {
-		return nil, nil, errors.New("the passed ID36 is not a submission")
+func (c *Reddit) getPostComments(postID models.RedditID, sort string, tdur string, limit int) ([]*models.Comment, error) {
+	if postID.Type() != models.KPost {
+		return nil, errors.New("the passed ID is not a post")
 	}
-	target := RedditOauth + "/comments/" + postID[3:]
+	target := fmt.Sprintf("%s/comments/%s", RedditOauth, postID[3:])
 	ans, err := c.MiraRequest("GET", target, map[string]string{
 		"sort":     sort,
 		"limit":    strconv.Itoa(limit),
@@ -366,21 +407,28 @@ func (c *Reddit) getSubmissionComments(postID string, sort string, tdur string, 
 		"t":        tdur,
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	temp := make([]models.CommentListing, 0, 8)
-	json.Unmarshal(ans, &temp)
-	ret := make([]models.Comment, 0, 8)
-	for _, v := range temp {
-		comments := v.GetChildren()
-		for _, v2 := range comments {
-			ret = append(ret, v2)
+
+	rets := []*models.Response{}
+	if err = json.Unmarshal(ans, &rets); err != nil {
+		return nil, err
+	}
+	if len(rets) < 2 {
+		// not two elements --> no comments
+		return []*models.Comment{}, nil
+	}
+	list, ok := rets[1].Data.(*models.Listing)
+	if !ok {
+		return nil, fmt.Errorf("couldn't convert to Listing struct. Data has Kind '%s'", rets[1].Kind)
+	}
+	ret := []*models.Comment{}
+	for _, comment := range list.Children {
+		if c, ok := comment.Data.(*models.Comment); ok {
+			ret = append(ret, c)
 		}
 	}
-	// Cut off the "more" kind
-	children := ret[len(ret)-1].Data.Children
-	ret = ret[:len(ret)-1]
-	return ret, children, nil
+	return ret, nil
 }
 
 // Get submisssions from a subreddit up to a specified limit sorted by the given parameters
@@ -391,20 +439,29 @@ func (c *Reddit) getSubmissionComments(postID string, sort string, tdur string, 
 // Limit is any numerical value, so 0 <= limit <= 100
 //
 // Anchor options are submissions full thing, for example: t3_bqqwm3
-func (c *Reddit) getSubredditPostsAfter(sr string, last string, limit int) ([]models.PostListingChild, error) {
+func (c *Reddit) getSubredditPostsAfter(sr string, last string, limit int) ([]*models.Post, error) {
 	target := RedditOauth + "/r/" + sr + "/new.json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
+	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"limit":  strconv.Itoa(limit),
 		"before": last,
 	})
-	ret := &models.PostListing{}
-	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*models.Post{}
+	for _, post := range list.Children {
+		if p, ok := post.Data.(*models.Post); ok {
+			ret = append(ret, p)
+		}
+	}
+
+	return ret, nil
 }
 
 // CommentsAfter gets comments for the last queued object after a given item.
 // Valid objects: Subreddit, Redditor
-func (c *Reddit) CommentsAfter(sort string, last string, limit int) ([]models.Comment, error) {
+func (c *Reddit) CommentsAfter(sort string, last string, limit int) ([]*models.Comment, error) {
 	name, ttype := c.getQueue()
 	switch ttype {
 	case "subreddit":
@@ -416,25 +473,34 @@ func (c *Reddit) CommentsAfter(sort string, last string, limit int) ([]models.Co
 	}
 }
 
-func (c *Reddit) getSubredditCommentsAfter(sr string, sort string, last string, limit int) ([]models.Comment, error) {
+func (c *Reddit) getSubredditCommentsAfter(sr string, sort string, last string, limit int) ([]*models.Comment, error) {
 	target := RedditOauth + "/r/" + sr + "/comments.json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{
+	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"sort":   sort,
 		"limit":  strconv.Itoa(limit),
 		"before": last,
 	})
-	ret := &models.CommentListing{}
-	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []*models.Comment{}
+	for _, comment := range list.Children {
+		if c, ok := comment.Data.(*models.Comment); ok {
+			ret = append(ret, c)
+		}
+	}
+
+	return ret, nil
 }
 
-// Submit submits a new Submission to the last queued object.
+// Submit submits a new Post to the last queued object.
 // Valid objects: Subreddit
-func (c *Reddit) Submit(title string, text string) (models.Submission, error) {
-	ret := &models.Submission{}
-	name, _, err := c.checkType("subreddit")
+func (c *Reddit) Submit(title string, text string) (*models.Post, error) {
+	ret := &models.Post{}
+	name, _, err := c.checkType(models.KSubreddit)
 	if err != nil {
-		return *ret, err
+		return nil, err
 	}
 	target := RedditOauth + "/api/submit"
 	ans, err := c.MiraRequest("POST", target, map[string]string{
@@ -445,17 +511,19 @@ func (c *Reddit) Submit(title string, text string) (models.Submission, error) {
 		"resubmit": "true",
 		"api_type": "json",
 	})
+	// :TODO: check reply type
+	fmt.Println(string(ans))
 	json.Unmarshal(ans, ret)
-	return *ret, err
+	return ret, err
 }
 
 // Reply adds a comment to the last queued object.
-// Valid objects: Comment, Submission
-func (c *Reddit) Reply(text string) (models.CommentWrap, error) {
-	ret := &models.CommentWrap{}
-	name, _, err := c.checkType("comment", "submission")
+// Valid objects: Comment, Post
+func (c *Reddit) Reply(text string) (*models.Comment, error) {
+	ret := &models.Comment{}
+	name, _, err := c.checkType(models.KComment, models.KPost)
 	if err != nil {
-		return *ret, err
+		return nil, err
 	}
 	target := RedditOauth + "/api/comment"
 	ans, err := c.MiraRequest("POST", target, map[string]string{
@@ -464,26 +532,30 @@ func (c *Reddit) Reply(text string) (models.CommentWrap, error) {
 		"api_type": "json",
 	})
 	json.Unmarshal(ans, ret)
-	return *ret, err
+	// :TODO: check reply type
+	fmt.Println(string(ans))
+	return ret, err
 }
 
 // ReplyWithID adds a comment to the given thing id, without it needing to be queued up.
-func (c *Reddit) ReplyWithID(name, text string) (models.CommentWrap, error) {
-	ret := &models.CommentWrap{}
+func (c *Reddit) ReplyWithID(name, text string) (*models.Comment, error) {
+	ret := &models.Comment{}
 	target := RedditOauth + "/api/comment"
 	ans, err := c.MiraRequest("POST", target, map[string]string{
 		"text":     text,
 		"thing_id": name,
 		"api_type": "json",
 	})
+	// :TODO: check reply type
+	fmt.Println(string(ans))
 	json.Unmarshal(ans, ret)
-	return *ret, err
+	return ret, err
 }
 
 // Delete the last queued object.
-// Valid objects: Comment, Submission
+// Valid objects: Comment, Post
 func (c *Reddit) Delete() error {
-	name, _, err := c.checkType("comment", "submission")
+	name, _, err := c.checkType(models.KComment, models.KPost)
 	if err != nil {
 		return err
 	}
@@ -496,9 +568,9 @@ func (c *Reddit) Delete() error {
 }
 
 // Approve the last queued object.
-// Valid objects: Comment, Submission
+// Valid objects: Comment, Post
 func (c *Reddit) Approve() error {
-	name, _, err := c.checkType("comment", "submission")
+	name, _, err := c.checkType(models.KComment, models.KPost)
 	if err != nil {
 		return err
 	}
@@ -513,7 +585,7 @@ func (c *Reddit) Approve() error {
 // Distinguish the last queued object.
 // Valid objects: Comment
 func (c *Reddit) Distinguish(how string, sticky bool) error {
-	name, _, err := c.checkType("comment")
+	name, _, err := c.checkType(models.KComment)
 	if err != nil {
 		return err
 	}
@@ -528,12 +600,12 @@ func (c *Reddit) Distinguish(how string, sticky bool) error {
 }
 
 // Edit the last queued object.
-// Valid objects: Comment, Submission
-func (c *Reddit) Edit(text string) (models.CommentWrap, error) {
-	ret := &models.CommentWrap{}
-	name, _, err := c.checkType("comment", "submission")
+// Valid objects: Comment, Post
+func (c *Reddit) Edit(text string) (*models.Comment, error) {
+	ret := &models.Comment{}
+	name, _, err := c.checkType(models.KComment, models.KPost)
 	if err != nil {
-		return *ret, err
+		return nil, err
 	}
 	target := RedditOauth + "/api/editusertext"
 	ans, err := c.MiraRequest("POST", target, map[string]string{
@@ -541,14 +613,16 @@ func (c *Reddit) Edit(text string) (models.CommentWrap, error) {
 		"thing_id": name,
 		"api_type": "json",
 	})
+	// :TODO: check reply type
+	fmt.Println(string(ans))
 	json.Unmarshal(ans, ret)
-	return *ret, err
+	return ret, err
 }
 
 // Compose writes a private message to the last queued object.
 // Valid objects: Redditor
 func (c *Reddit) Compose(subject, text string) error {
-	name, _, err := c.checkType("redditor")
+	name, _, err := c.checkType(models.KRedditor)
 	if err != nil {
 		return err
 	}
@@ -589,8 +663,8 @@ func (c *Reddit) ReadAllMessages() error {
 }
 
 // ListUnreadMessages for the last queued object.
-// Valid objects: Comment, Submission
-func (c *Reddit) ListUnreadMessages() ([]models.Comment, error) {
+// Valid objects: Me
+func (c *Reddit) ListUnreadMessages() ([]*models.Comment, error) {
 	_, _, err := c.checkType("me")
 	if err != nil {
 		return nil, err
@@ -599,15 +673,17 @@ func (c *Reddit) ListUnreadMessages() ([]models.Comment, error) {
 	ans, err := c.MiraRequest("GET", target, map[string]string{
 		"mark": "false",
 	})
-	ret := &models.CommentListing{}
+	ret := []*models.Comment{}
+	// :TODO: check reply type
+	fmt.Println(string(ans))
 	json.Unmarshal(ans, ret)
-	return ret.GetChildren(), err
+	return ret, err
 }
 
 // UpdateSidebar of the last queued object.
 // Valid objects: Subreddit
 func (c *Reddit) UpdateSidebar(text string) error {
-	name, _, err := c.checkType("subreddit")
+	name, _, err := c.checkType(models.KSubreddit)
 	if err != nil {
 		return err
 	}
@@ -628,7 +704,7 @@ func (c *Reddit) UpdateSidebar(text string) error {
 // UserFlair assigns a specific flair to a user on the last queued object.
 // Valid objects: Subreddit
 func (c *Reddit) UserFlair(user, text string) error {
-	name, _, err := c.checkType("subreddit")
+	name, _, err := c.checkType(models.KSubreddit)
 	if err != nil {
 		return err
 	}
@@ -642,9 +718,9 @@ func (c *Reddit) UserFlair(user, text string) error {
 }
 
 // SelectFlair for the last queued object.
-// Valid objects: Submission
+// Valid objects: Post
 func (c *Reddit) SelectFlair(text string) error {
-	name, _, err := c.checkType("submission")
+	name, _, err := c.checkType(models.KPost)
 	if err != nil {
 		return err
 	}
@@ -657,24 +733,24 @@ func (c *Reddit) SelectFlair(text string) error {
 	return err
 }
 
-func (c *Reddit) checkType(rtype ...string) (string, string, error) {
+func (c *Reddit) checkType(rtype ...models.RedditKind) (string, models.RedditKind, error) {
 	name, ttype := c.getQueue()
 	if name == "" {
 		return "", "", fmt.Errorf("identifier is empty")
 	}
 	if !findElem(ttype, rtype) {
-		return "", "", fmt.Errorf("the passed type is not a valid type for this call | expected: %s", strings.Join(rtype, ", "))
+		return "", "", fmt.Errorf("the passed type is not a valid type for this call | expected: %s", rtype)
 	}
 	return name, ttype, nil
 }
 
-func (c *Reddit) addQueue(name string, ttype string) {
+func (c *Reddit) addQueue(name string, ttype models.RedditKind) {
 	queueMutex.Lock()
 	defer queueMutex.Unlock()
 	c.Chain = append(c.Chain, chainVals{Name: name, Type: ttype})
 }
 
-func (c *Reddit) getQueue() (string, string) {
+func (c *Reddit) getQueue() (string, models.RedditKind) {
 	queueMutex.Lock()
 	defer queueMutex.Unlock()
 	if len(c.Chain) < 1 {
@@ -684,7 +760,7 @@ func (c *Reddit) getQueue() (string, string) {
 	return c.Chain[0].Name, c.Chain[0].Type
 }
 
-func findElem(elem string, arr []string) bool {
+func findElem(elem models.RedditKind, arr []models.RedditKind) bool {
 	for _, v := range arr {
 		if elem == v {
 			return true

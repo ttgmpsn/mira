@@ -1,16 +1,18 @@
 package models
 
-func (me Me) GetID() string        { return me.ID }
-func (me Me) GetName() string      { return me.Name }
-func (me Me) GetAuthor() string    { return me.Name }
-func (me Me) GetParentID() string  { return me.ID }
-func (me Me) GetTitle() string     { return me.Name }
-func (me Me) GetBody() string      { return me.Name }
-func (me Me) GetKarma() float64    { return me.CommentKarma + me.LinkKarma }
-func (me Me) GetUps() float64      { return 0 }
-func (me Me) GetDowns() float64    { return 0 }
-func (me Me) GetSubreddit() string { return me.Name }
-func (me Me) GetCreated() float64  { return me.Created }
-func (me Me) GetFlair() string     { return "" }
-func (me Me) GetURL() string       { return me.IconImg }
-func (me Me) IsRoot() bool         { return true }
+import (
+	"fmt"
+	"net/url"
+	"time"
+)
+
+// GetID returns the RedditID of You
+func (me Me) GetID() RedditID { return RedditID("t2_" + me.ID) }
+
+// CreatedAt returns your account creation date
+func (me Me) CreatedAt() time.Time { return time.Unix(me.CreatedUTC, 0) }
+
+// GetURL returns a link to your profile
+func (me Me) GetURL() string {
+	return fmt.Sprintf("https://www.reddit.com/u/%s", url.PathEscape(me.Name))
+}
