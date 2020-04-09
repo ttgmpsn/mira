@@ -12,7 +12,7 @@ type Me struct {
 	PrefShowTrending        bool          `json:"pref_show_trending"`
 	Subreddit               userSubreddit `json:"subreddit"`
 	IsSponsor               bool          `json:"is_sponsor"`
-	GoldExpiration          int64         `json:"gold_expiration"`
+	GoldExpiration          float64       `json:"gold_expiration"`
 	HasGoldSubscription     bool          `json:"has_gold_subscription"`
 	NumFriends              uint          `json:"num_friends"`
 	Features                MeFeatures    `json:"features"`
@@ -30,7 +30,7 @@ type Me struct {
 	Over18                  bool          `json:"over_18"`
 	IsGold                  bool          `json:"is_gold"`
 	IsMod                   bool          `json:"is_mod"`
-	SuspensionExpirationUTC int64         `json:"suspension_expiration_utc"`
+	SuspensionExpirationUTC float64       `json:"suspension_expiration_utc"`
 	HasVerifiedEmail        bool          `json:"has_verified_email"`
 	IsSuspended             bool          `json:"is_suspended"`
 	PrefVideoAutoplay       bool          `json:"pref_video_autoplay"`
@@ -39,7 +39,7 @@ type Me struct {
 	IconImg                 string        `json:"icon_img"`
 	HasModMail              bool          `json:"has_mod_mail"`
 	PrefNightmode           bool          `json:"pref_nightmode"`
-	OauthClientID           bool          `json:"oauth_client_id"`
+	OauthClientID           string        `json:"oauth_client_id"`
 	HideFromRobots          bool          `json:"hide_from_robots"`
 	LinkKarma               int           `json:"link_karma"`
 	ForcePasswordReset      bool          `json:"force_password_reset"`
@@ -49,8 +49,8 @@ type Me struct {
 	PrefShowSnoovatar       bool          `json:"pref_show_snoovatar"`
 	Name                    string        `json:"name"`
 	PrefClickgadget         uint          `json:"pref_clickgadget"`
-	Created                 int64         `json:"created"`
-	CreatedUTC              int64         `json:"created_utc"`
+	Created                 float64       `json:"created"`
+	CreatedUTC              float64       `json:"created_utc"`
 	GoldCreddits            uint          `json:"gold_creddits"`
 	HasIosSubscription      bool          `json:"has_ios_subscription"`
 	PrefShowTwitter         bool          `json:"pref_show_twitter"`

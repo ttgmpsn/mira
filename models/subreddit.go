@@ -9,4 +9,4 @@ func (s Subreddit) GetID() RedditID { return s.Name }
 func (s Subreddit) GetURL() string { return s.URL }
 
 // CreatedAt returns the time.Time of the Subreddits creation
-func (s Subreddit) CreatedAt() time.Time { return time.Unix(s.CreatedUTC, 0) }
+func (s Subreddit) CreatedAt() time.Time { return time.Unix(int64(s.CreatedUTC), 0) }

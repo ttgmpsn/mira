@@ -21,7 +21,7 @@ func (p Post) GetAuthor() string { return p.Author }
 func (p Post) GetAuthorID() RedditID { return p.AuthorFullname }
 
 // CreatedAt returns time.Time the Post was created at
-func (p Post) CreatedAt() time.Time { return time.Unix(p.CreatedUTC, 0) }
+func (p Post) CreatedAt() time.Time { return time.Unix(int64(p.CreatedUTC), 0) }
 
 // GetBody returns the content of the Post in Markdown
 func (p Post) GetBody() string { return p.Selftext }
@@ -48,7 +48,7 @@ func (p Post) GetURL() string { return p.URL }
 func (p Post) GetBanned() SubModAction {
 	return SubModAction{
 		Mod: p.BannedBy,
-		At:  time.Unix(p.BannedAtUTC, 0),
+		At:  time.Unix(int64(p.BannedAtUTC), 0),
 	}
 }
 
@@ -56,7 +56,7 @@ func (p Post) GetBanned() SubModAction {
 func (p Post) GetApproved() SubModAction {
 	return SubModAction{
 		Mod: p.ApprovedBy,
-		At:  time.Unix(p.ApprovedAtUTC, 0),
+		At:  time.Unix(int64(p.ApprovedAtUTC), 0),
 	}
 }
 

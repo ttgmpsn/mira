@@ -5,7 +5,7 @@ type ModAction struct {
 	Description           string   `json:"description"`
 	TargetBody            string   `json:"target_body"`
 	ModID36               string   `json:"mod_id36"`
-	CreatedUTC            int64    `json:"created_utc"`
+	CreatedUTC            float64  `json:"created_utc"`
 	Subreddit             string   `json:"subreddit"`
 	TargetTitle           string   `json:"target_title"`
 	TargetPermalink       string   `json:"target_permalink"`

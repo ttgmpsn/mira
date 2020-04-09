@@ -10,7 +10,7 @@ import (
 func (me Me) GetID() RedditID { return RedditID("t2_" + me.ID) }
 
 // CreatedAt returns your account creation date
-func (me Me) CreatedAt() time.Time { return time.Unix(me.CreatedUTC, 0) }
+func (me Me) CreatedAt() time.Time { return time.Unix(int64(me.CreatedUTC), 0) }
 
 // GetURL returns a link to your profile
 func (me Me) GetURL() string {

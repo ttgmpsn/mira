@@ -24,7 +24,7 @@ func (c Comment) GetAuthor() string { return c.Author }
 func (c Comment) GetAuthorID() RedditID { return c.AuthorFullname }
 
 // CreatedAt returns the time.Time the post was created at
-func (c Comment) CreatedAt() time.Time { return time.Unix(c.CreatedUTC, 0) }
+func (c Comment) CreatedAt() time.Time { return time.Unix(int64(c.CreatedUTC), 0) }
 
 // GetBody returns the content of the Comment in Markdown
 func (c Comment) GetBody() string { return c.Body }
@@ -54,7 +54,7 @@ func (c Comment) GetURL() string { return fmt.Sprintf("https://www.reddit.com%s"
 func (c Comment) GetBanned() SubModAction {
 	return SubModAction{
 		Mod: c.BannedBy,
-		At:  time.Unix(c.BannedAtUTC, 0),
+		At:  time.Unix(int64(c.BannedAtUTC), 0),
 	}
 }
 
@@ -62,7 +62,7 @@ func (c Comment) GetBanned() SubModAction {
 func (c Comment) GetApproved() SubModAction {
 	return SubModAction{
 		Mod: c.ApprovedBy,
-		At:  time.Unix(c.ApprovedAtUTC, 0),
+		At:  time.Unix(int64(c.ApprovedAtUTC), 0),
 	}
 }
 

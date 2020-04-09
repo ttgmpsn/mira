@@ -46,7 +46,7 @@ type Subreddit struct {
 	KeyColor                   string   `json:"key_color"`
 	EventPostsEnabled          bool     `json:"event_posts_enabled"`
 	CanAssignUserFlair         bool     `json:"can_assign_user_flair"`
-	Created                    int64    `json:"created"`
+	Created                    float64  `json:"created"`
 	ShowMediaPreview           bool     `json:"show_media_preview"`
 	SubmissionType             string   `json:"submission_type"`
 	UserIsSubscriber           bool     `json:"user_is_subscriber"`
@@ -85,7 +85,7 @@ type Subreddit struct {
 	Lang                       string   `json:"lang"`
 	WhitelistStatus            string   `json:"whitelist_status"`
 	URL                        string   `json:"url"`
-	CreatedUTC                 int64    `json:"created_utc"`
+	CreatedUTC                 float64  `json:"created_utc"`
 	BannerSize                 []int64  `json:"banner_size"`
 	MobileBannerImage          string   `json:"mobile_banner_image"`
 	UserIsContributor          bool     `json:"user_is_contributor"`

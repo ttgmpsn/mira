@@ -7,12 +7,12 @@ type Redditor struct {
 	PrefShowSnoovatar bool          `json:"pref_show_snoovatar"`
 	Name              string        `json:"name"`
 	IsFriend          bool          `json:"is_friend"`
-	Created           int64         `json:"created"`
+	Created           float64       `json:"created"`
 	HasSubscribed     bool          `json:"has_subscribed"`
 	HideFromRobots    bool          `json:"hide_from_robots"`
-	CreatedUTC        int64         `json:"created_utc"`
-	LinkKarma         float64       `json:"link_karma"`
-	CommentKarma      float64       `json:"comment_karma"`
+	CreatedUTC        float64       `json:"created_utc"`
+	LinkKarma         int           `json:"link_karma"`
+	CommentKarma      int           `json:"comment_karma"`
 	IsGold            bool          `json:"is_gold"`
 	IsMod             bool          `json:"is_mod"`
 	Verified          bool          `json:"verified"`
