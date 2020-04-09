@@ -36,7 +36,7 @@ func (c *Reddit) Wiki(page string) (*models.Wiki, error) {
 
 // ModQueue returns the mod queue from the last queued object.
 // Valid objects: Subreddit
-func (c *Reddit) ModQueue(limit int) ([]*models.Submission, error) {
+func (c *Reddit) ModQueue(limit int) ([]models.Submission, error) {
 	sr, ttype := c.getQueue()
 	if ttype != models.KSubreddit {
 		return nil, fmt.Errorf("'%s' type does not have an option for modqueue", ttype)
@@ -50,10 +50,10 @@ func (c *Reddit) ModQueue(limit int) ([]*models.Submission, error) {
 		return nil, err
 	}
 
-	ret := []*models.Submission{}
+	ret := []models.Submission{}
 	for _, post := range list.Children {
 		if p, ok := post.Data.(models.Submission); ok {
-			ret = append(ret, &p)
+			ret = append(ret, p)
 		}
 	}
 

@@ -102,12 +102,14 @@ type Submission interface {
 	GetSubreddit() string
 	GetSubredditID() RedditID
 	GetParentID() RedditID
+	GetTitle() string
 	GetBody() string
 	GetScore() int
 	IsSticky() bool
 	// Mod Stuff
 	IsRemoved() bool
 	IsApproved() bool
-	GetBannedBy() string
-	GetNumReports() uint
+	GetBanned() SubModAction
+	GetApproved() SubModAction
+	GetReports() AllReports
 }

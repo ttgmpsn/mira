@@ -29,6 +29,9 @@ func (c Comment) CreatedAt() time.Time { return time.Unix(c.CreatedUTC, 0) }
 // GetBody returns the content of the Comment in Markdown
 func (c Comment) GetBody() string { return c.Body }
 
+// GetTitle returns an empty string and is here to fulfull the Submission interface
+func (c Comment) GetTitle() string { return "" }
+
 // GetScore returns the current score of the Comment
 func (c Comment) GetScore() int { return c.Score }
 
@@ -47,8 +50,27 @@ func (c Comment) IsAuthor() bool { return c.IsSubmitter }
 // GetURL returns the link to the Comment
 func (c Comment) GetURL() string { return fmt.Sprintf("https://www.reddit.com%s", c.Permalink) }
 
-// GetBannedBy returns the user who deleted the Comment
-func (c Comment) GetBannedBy() string { return c.BannedBy }
+// GetBanned returns the mod & time who deleted the Comment
+func (c Comment) GetBanned() SubModAction {
+	return SubModAction{
+		Mod: c.BannedBy,
+		At:  time.Unix(c.BannedAtUTC, 0),
+	}
+}
 
-// GetNumReports returns the report count for the Comment
-func (c Comment) GetNumReports() uint { return c.NumReports }
+// GetApproved returns the mod & time who approved the Comment
+func (c Comment) GetApproved() SubModAction {
+	return SubModAction{
+		Mod: c.ApprovedBy,
+		At:  time.Unix(c.ApprovedAtUTC, 0),
+	}
+}
+
+// GetReports returns the reports for the Comment
+func (c Comment) GetReports() AllReports {
+	return AllReports{
+		Mod:  c.ModReports,
+		User: c.UserReports,
+		Num:  c.NumReports,
+	}
+}

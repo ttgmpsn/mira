@@ -1,6 +1,9 @@
 package models
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 // UserReport is a submission report from a user
 type UserReport struct {
@@ -41,4 +44,17 @@ func (mr *ModReport) UnmarshalJSON(data []byte) error {
 	mr.Mod = v[1].(string)
 
 	return nil
+}
+
+// AllReports simply combines ModReports & UserReports
+type AllReports struct {
+	Num  uint
+	Mod  []ModReport
+	User []UserReport
+}
+
+// SubModAction is a removal/approval with a timestamp
+type SubModAction struct {
+	Mod string
+	At  time.Time
 }

@@ -44,8 +44,27 @@ func (p Post) GetTitle() string { return p.Title }
 // GetURL returns the link to the Post
 func (p Post) GetURL() string { return p.URL }
 
-// GetBannedBy returns the user who deleted the Post
-func (p Post) GetBannedBy() string { return p.BannedBy }
+// GetBanned returns the mod & time who deleted the Post
+func (p Post) GetBanned() SubModAction {
+	return SubModAction{
+		Mod: p.BannedBy,
+		At:  time.Unix(p.BannedAtUTC, 0),
+	}
+}
 
-// GetNumReports returns the report count for the Post
-func (p Post) GetNumReports() uint { return p.NumReports }
+// GetApproved returns the mod & time who approved the Post
+func (p Post) GetApproved() SubModAction {
+	return SubModAction{
+		Mod: p.ApprovedBy,
+		At:  time.Unix(p.ApprovedAtUTC, 0),
+	}
+}
+
+// GetReports returns the reports for the Post
+func (p Post) GetReports() AllReports {
+	return AllReports{
+		Mod:  p.ModReports,
+		User: p.UserReports,
+		Num:  p.NumReports,
+	}
+}
