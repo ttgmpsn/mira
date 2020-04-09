@@ -2,6 +2,7 @@ package mira
 
 import "net/http"
 
+// Init will initialize the Reddit instance.
 // When we initialize the Reddit instance,
 // automatically start a goroutine that will
 // update the token every 45 minutes. The
@@ -14,6 +15,6 @@ func Init(c Credentials) (*Reddit, error) {
 	}
 	auth.Client = &http.Client{}
 	auth.SetDefault()
-	go auth.auto_refresh()
+	go auth.autoRefresh()
 	return auth, nil
 }

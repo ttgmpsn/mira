@@ -6,6 +6,7 @@ import (
 	"github.com/thecsw/mira/models"
 )
 
+// StreamCommentReplies streams replies to your comments, taken form the DMs.
 // c is the channel with all unread messages
 // stop is the channel to stop the stream. Do stop <- true to stop the loop
 func (r *Reddit) StreamCommentReplies() <-chan models.Comment {
@@ -28,6 +29,7 @@ func (r *Reddit) StreamCommentReplies() <-chan models.Comment {
 	return c
 }
 
+// StreamMentions streams your username mentions, taken from the DMs.
 // c is the channel with all unread messages
 // stop is the channel to stop the stream. Do stop <- true to stop the loop
 func (r *Reddit) StreamMentions() <-chan models.Comment {
@@ -50,6 +52,8 @@ func (r *Reddit) StreamMentions() <-chan models.Comment {
 	return c
 }
 
+// StreamComments streams all comments for a queued object.
+// Valid objects: Subreddit, Redditor
 // c is the channel with all comments
 // stop is the channel to stop the stream. Do stop <- true to stop the loop
 func (r *Reddit) StreamComments() (<-chan models.Comment, error) {
@@ -120,6 +124,8 @@ func (r *Reddit) streamRedditorComments(redditor string) (<-chan models.Comment,
 	return c, nil
 }
 
+// StreamSubmissions streams all submissions for a queued object.
+// Valid objects: Subreddit, Redditor
 func (r *Reddit) StreamSubmissions() (<-chan models.PostListingChild, error) {
 	name, ttype, err := r.checkType("subreddit", "redditor")
 	if err != nil {

@@ -10,18 +10,19 @@ import (
 	"time"
 )
 
+// Credentials holds the required information for authentication
 type Credentials struct {
-	ClientId     string
+	ClientID     string
 	ClientSecret string
 	Username     string
 	Password     string
 	UserAgent    string
 }
 
-// Returns an access_token acquired using the provided credentials
+// Authenticate returns an access_token acquired using the provided credentials
 func Authenticate(c *Credentials) (*Reddit, error) {
 	// URL to get access_token
-	auth_url := RedditBase + "api/v1/access_token"
+	authURL := RedditBase + "api/v1/access_token"
 
 	// Define the data to send in the request
 	form := url.Values{}
@@ -30,11 +31,11 @@ func Authenticate(c *Credentials) (*Reddit, error) {
 	form.Add("password", c.Password)
 
 	// Encode the Authorization Header
-	raw := c.ClientId + ":" + c.ClientSecret
+	raw := c.ClientID + ":" + c.ClientSecret
 	encoded := b64.StdEncoding.EncodeToString([]byte(raw))
 
 	// Create a request to allow customised headers
-	r, err := http.NewRequest("POST", auth_url, strings.NewReader(form.Encode()))
+	r, err := http.NewRequest("POST", authURL, strings.NewReader(form.Encode()))
 	if err != nil {
 		return nil, err
 	}
@@ -69,20 +70,21 @@ func Authenticate(c *Credentials) (*Reddit, error) {
 // This goroutine reauthenticates the user
 // every 45 minutes. It should be run with the go
 // statement
-func (c *Reddit) auto_refresh() {
+func (c *Reddit) autoRefresh() {
 	for {
 		time.Sleep(45 * time.Minute)
-		c.update_creds()
+		c.updateCreds()
 	}
 }
 
 // Reauthenticate and updates the object itself
-func (c *Reddit) update_creds() {
+func (c *Reddit) updateCreds() {
 	temp, _ := Authenticate(&c.Creds)
 	// Just updated the token
 	c.Token = temp.Token
 }
 
+// SetDefault gets sensible default values for streams.
 func (c *Reddit) SetDefault() {
 	c.Stream = Streaming{
 		CommentListInterval: 8,
@@ -94,6 +96,7 @@ func (c *Reddit) SetDefault() {
 	}
 }
 
+// SetClient replaces the htpClient with a custom one (e.g. for custom timeout settings)
 func (c *Reddit) SetClient(client *http.Client) {
 	c.Client = client
 }

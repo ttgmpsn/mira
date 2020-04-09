@@ -1,6 +1,7 @@
 package mira
 
-type MiraInterface interface {
+// Interface can be used for any reddit object (Post, Comment, etc.) to avoid type hinting.
+type Interface interface {
 	GetId() string
 	GetParentId() string
 	GetTitle() string
