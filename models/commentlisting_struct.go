@@ -37,7 +37,7 @@ type CommentListingDataChildrenData struct {
 	LinkTitle             string   `json:"link_title"`
 	Permalink             string   `json:"permalink"`
 	Dest                  string   `json:"dest"`
-	BodyHTL               string   `json:"body_html"`
+	BodyHTML              string   `json:"body_html"`
 	Name                  string   `json:"name"`
 	Created               float64  `json:"created"`
 	CreatedUTC            float64  `json:"created_utc"`

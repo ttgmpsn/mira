@@ -47,7 +47,7 @@ type PostListingChildData struct {
 	ThumbnailWidth             float64            `json:"thumbnail_width"`
 	AuthorFlairTemplateID      string             `json:"author_flair_template_id"`
 	IsOriginalContent          bool               `json:"is_original_content"`
-	UserReports                []string           `json:"user_reports"`
+	UserReports                []UserReport       `json:"user_reports"`
 	SecureMedia                string             `json:"secure_media"`
 	IsRedditMediaDomain        bool               `json:"is_reddit_media_domain"`
 	IsMeta                     bool               `json:"is_meta"`
@@ -72,7 +72,7 @@ type PostListingChildData struct {
 	BannedBy                   string             `json:"banned_by"`
 	AuthorFlairType            string             `json:"author_flair_type"`
 	Domain                     string             `json:"domain"`
-	SelftexHTML                string             `json:"selftext_html"`
+	SelftextHTML               string             `json:"selftext_html"`
 	Likes                      float64            `json:"likes"`
 	SuggestedSort              string             `json:"suggested_sort"`
 	BannedAtUTC                float64            `json:"banned_at_utc"`
@@ -105,7 +105,7 @@ type PostListingChildData struct {
 	SendReplies                bool               `json:"send_replies"`
 	WhitelistStatus            string             `json:"whitelist_status"`
 	ContestMode                bool               `json:"contest_mode"`
-	ModReports                 []string           `json:"mod_reports"`
+	ModReports                 []ModReport        `json:"mod_reports"`
 	AuthorPatreonFlair         bool               `json:"author_patreon_flair"`
 	AuthorFlairTextColor       string             `json:"author_flair_text_color"`
 	Permalink                  string             `json:"permalink"`
