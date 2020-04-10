@@ -54,7 +54,7 @@ type Comment struct {
 	AuthorFlairTextColor       string              `json:"author_flair_text_color"`
 	ScoreHidden                bool                `json:"score_hidden"`
 	Permalink                  string              `json:"permalink"`
-	NumReports                 uint                `json:"num_reports"`
+	NumReports                 int                 `json:"num_reports"`
 	Locked                     bool                `json:"locked"`
 	Created                    float64             `json:"created"`
 	Subreddit                  string              `json:"subreddit"`

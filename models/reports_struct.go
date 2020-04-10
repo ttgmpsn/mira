@@ -48,7 +48,7 @@ func (mr *ModReport) UnmarshalJSON(data []byte) error {
 
 // AllReports simply combines ModReports & UserReports
 type AllReports struct {
-	Num  uint
+	Num  int
 	Mod  []ModReport
 	User []UserReport
 }

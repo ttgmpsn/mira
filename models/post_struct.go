@@ -56,7 +56,7 @@ type Post struct {
 	AuthorFlairType            string              `json:"author_flair_type"`
 	Domain                     string              `json:"domain"`
 	SelftextHTML               string              `json:"selftext_html"`
-	Likes                      uint                `json:"likes"`
+	Likes                      bool                `json:"likes"`
 	SuggestedSort              string              `json:"suggested_sort"`
 	BannedAtUTC                float64             `json:"banned_at_utc"`
 	ViewCount                  uint                `json:"view_count"`
@@ -67,10 +67,9 @@ type Post struct {
 	Over18                     bool                `json:"over_18"`
 	Preview                    struct {
 		Images []struct {
-			Source      Image    `json:"source"`
-			Resolutions []Image  `json:"resolutions"`
-			Variants    []string `json:"variants"`
-			ID          string   `json:"id"`
+			Source      Image   `json:"source"`
+			Resolutions []Image `json:"resolutions"`
+			ID          string  `json:"id"`
 		} `json:"images"`
 		Enabled bool `json:"enabled"`
 	} `json:"preview"`
@@ -81,7 +80,7 @@ type Post struct {
 	Locked                   bool        `json:"locked"`
 	AuthorFlairText          string      `json:"author_flair_text"`
 	Visited                  bool        `json:"visited"`
-	NumReports               uint        `json:"num_reports"`
+	NumReports               int         `json:"num_reports"`
 	Distinguished            bool        `json:"distinguished"`
 	SubredditID              RedditID    `json:"subreddit_id"`
 	ModReasonBy              string      `json:"mod_reason_by"`
@@ -89,7 +88,6 @@ type Post struct {
 	LinkFlairBackgroundColor string      `json:"link_flair_background_color"`
 	ID                       string      `json:"id"`
 	IsRobotIndexable         bool        `json:"is_robot_indexable"`
-	ReportReasons            []string    `json:"report_reasons"`
 	Author                   string      `json:"author"`
 	NumCrossposts            uint        `json:"num_crossposts"`
 	NumComments              uint        `json:"num_comments"`

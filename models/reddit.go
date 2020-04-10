@@ -63,6 +63,7 @@ type Response struct {
 
 // UnmarshalJSON helps to convert Response.Data into a useful object depending on Kind
 func (r *Response) UnmarshalJSON(data []byte) error {
+	//fmt.Println(string(data))
 	var m struct {
 		Kind responseType    `json:"kind"`
 		Data json.RawMessage `json:"data"`
