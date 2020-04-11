@@ -42,7 +42,7 @@ type Post struct {
 	Score                      int                 `json:"score"`
 	ApprovedBy                 string              `json:"approved_by"`
 	Thumbnail                  string              `json:"thumbnail"`
-	Edited                     bool                `json:"edited"`
+	Edited                     json.RawMessage     `json:"edited"` // bool or float64
 	AuthorFlairCSSClass        string              `json:"author_flair_css_class"`
 	AuthorFlairRichtext        []map[string]string `json:"author_flair_richtext"`
 	Gildings                   map[string]int      `json:"gildings"`
