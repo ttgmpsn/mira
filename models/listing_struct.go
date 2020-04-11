@@ -53,3 +53,13 @@ func (r *RedditElement) UnmarshalJSON(data []byte) error {
 	r.Kind = m.Kind
 	return json.Unmarshal(m.Data, r.Data)
 }
+
+// ActionResponse is returned by reddit when you actively do something (create a comment, for example)
+type ActionResponse struct {
+	JSON struct {
+		Errors []string `json:"errors"`
+		Data   struct {
+			Things []RedditElement `json:"things"`
+		}
+	} `json:"json"`
+}
