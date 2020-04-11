@@ -32,8 +32,6 @@ func (c *Reddit) MiraRequest(method string, target string, payload map[string]st
 		return nil, err
 	}
 	requestMutex.Lock()
-	r.Header.Set("User-Agent", c.Creds.UserAgent)
-	r.Header.Set("Authorization", "Bearer "+c.Token)
 	response, err := c.Client.Do(r)
 	requestMutex.Unlock()
 	if err != nil {
@@ -67,7 +65,7 @@ func (c *Reddit) miraRequestListing(method string, target string, payload map[st
 
 // Me Redditor queues up the next action to be about the logged in user.
 func (c *Reddit) Me() *Reddit {
-	c.addQueue(c.Creds.Username, "me")
+	c.addQueue("", "me")
 	return c
 }
 

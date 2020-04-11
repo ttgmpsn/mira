@@ -1,28 +1,35 @@
 package mira
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	"github.com/ttgmpsn/mira/models"
+	"golang.org/x/oauth2"
 )
+
+// Credentials stores information for authing towards the Reddit API
+type Credentials struct {
+	ClientID     string
+	ClientSecret string
+	Username     string
+	Password     string
+	UserAgent    string
+	RedirectURL  string
+}
 
 // Reddit holds the connection to the API for a user
 type Reddit struct {
-	Token    string  `json:"access_token"`
-	Duration float64 `json:"expires_in"`
-	Creds    Credentials
-	Chain    []chainVals
-	Stream   Streaming
-	Values   RedditVals
-	Client   *http.Client
-}
+	Client      *http.Client
+	creds       Credentials
+	OAuthConfig *oauth2.Config
+	TokenExpiry time.Time
+	UserAgent   string
+	ctx         context.Context
 
-// Streaming holds information
-type Streaming struct {
-	CommentListInterval time.Duration
-	PostListInterval    time.Duration
-	PostListSlice       int
+	Chain  []chainVals
+	Values RedditVals
 }
 
 // RedditVals holds configuration values for

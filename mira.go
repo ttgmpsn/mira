@@ -1,20 +1,10 @@
 package mira
 
-import "net/http"
-
 // Init will initialize the Reddit instance.
-// When we initialize the Reddit instance,
-// automatically start a goroutine that will
-// update the token every 45 minutes. The
-// auto_refresh should not be accessible to
-// the end user as it is an internal method
-func Init(c Credentials) (*Reddit, error) {
-	auth, err := Authenticate(&c)
-	if err != nil {
-		return nil, err
-	}
-	auth.Client = &http.Client{}
+// Note that you most likely want to auth using
+// LoginAuth() or CodeAuth()
+func Init(c Credentials) *Reddit {
+	auth := NewOAuthSession(c)
 	auth.SetDefault()
-	go auth.autoRefresh()
-	return auth, nil
+	return auth
 }
