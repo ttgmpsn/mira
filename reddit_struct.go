@@ -29,11 +29,10 @@ type Reddit struct {
 	ctx         context.Context
 
 	Chain  []chainVals
-	Values RedditVals
+	Values redditVals
 }
 
-// RedditVals holds configuration values for
-type RedditVals struct {
+type redditVals struct {
 	GetSubmissionFromCommentTries int
 }
 

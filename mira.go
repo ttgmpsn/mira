@@ -4,7 +4,7 @@ package mira
 // Note that you most likely want to auth using
 // LoginAuth() or CodeAuth()
 func Init(c Credentials) *Reddit {
-	auth := NewOAuthSession(c)
+	auth := newOAuthSession(c)
 	auth.SetDefault()
 	return auth
 }

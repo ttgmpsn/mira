@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"golang.org/x/oauth2"
 )
@@ -24,8 +25,8 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 // Thanks geddit :)
 
 // NewOAuthSession creates a new session for those who want to log into a
-// reddit account via OAuth.
-func NewOAuthSession(creds Credentials) *Reddit {
+// reddit account via OAuth. Please use Init() instead of calling this function.
+func newOAuthSession(creds Credentials) *Reddit {
 	r := &Reddit{creds: creds}
 
 	if len(r.creds.UserAgent) == 0 {
@@ -78,30 +79,85 @@ func (c *Reddit) LoginAuth() error {
 // AuthCodeURL creates and returns an auth URL which contains an auth code.
 func (c *Reddit) AuthCodeURL(state string, scopes []string) string {
 	c.OAuthConfig.Scopes = scopes
-	return c.OAuthConfig.AuthCodeURL(state, oauth2.AccessTypeOnline)
+	return c.OAuthConfig.AuthCodeURL(state, oauth2.AccessTypeOnline, oauth2.SetAuthURLParam("duration", "permanent"))
 }
 
 // CodeAuth creates and sets a token using an authentication code returned from AuthCodeURL.
 // Note that Username & Password provided to NewOAuthSession are ignored.
-func (c *Reddit) CodeAuth(code string) error {
+// You can optionally pass a TokenNotifyFunc to get notified when the token changes (i.e. to
+// store it into a database). Pass nil if you do not want to use this.
+func (c *Reddit) CodeAuth(code string, f TokenNotifyFunc) error {
 	t, err := c.OAuthConfig.Exchange(c.ctx, code)
 	if err != nil {
 		return err
 	}
-	c.Client = c.OAuthConfig.Client(c.ctx, t)
-	return nil
+
+	return c.SetToken(t, c.OAuthConfig.Scopes, f)
 }
 
 // SetToken manually assigns a token to the Reddit object.
 // This is useful if you have your token information saved from a prior run.
-func (c *Reddit) SetToken(t *oauth2.Token, scopes []string) {
+// You can optionally pass a TokenNotifyFunc to get notified when the token changes (i.e. to
+// store it into a database). Pass nil if you do not want to use this.
+func (c *Reddit) SetToken(t *oauth2.Token, scopes []string, f TokenNotifyFunc) error {
 	c.OAuthConfig.Scopes = scopes
-	c.Client = c.OAuthConfig.Client(c.ctx, t)
+
+	if f == nil {
+		f = func(t *oauth2.Token) error { return nil }
+	}
+
+	err := f(t)
+	if err != nil {
+		return err
+	}
+
+	nrts := &NotifyRefreshTokenSource{
+		new: c.OAuthConfig.TokenSource(c.ctx, t),
+		t:   t,
+		f:   f,
+	}
+
+	c.Client = oauth2.NewClient(c.ctx, nrts)
+	return nil
 }
 
 // SetDefault gets sensible default values for streams.
 func (c *Reddit) SetDefault() {
-	c.Values = RedditVals{
+	c.Values = redditVals{
 		GetSubmissionFromCommentTries: 32,
 	}
+}
+
+// TokenNotifyFunc is a function that accepts an oauth2 Token upon refresh, and
+// returns an error if it should not be used. Use this to cache Refresh Token
+// if you want to (you'll most likely want to).
+// Taken from https://github.com/golang/oauth2/issues/84#issuecomment-332517319
+type TokenNotifyFunc func(*oauth2.Token) error
+type contextKey struct{}
+
+var tokenNotifyFuncKey contextKey
+
+// NotifyRefreshTokenSource is essentially `oauth2.ResuseTokenSource` with `TokenNotifyFunc` added.
+type NotifyRefreshTokenSource struct {
+	new oauth2.TokenSource
+	mu  sync.Mutex // guards t
+	t   *oauth2.Token
+	f   TokenNotifyFunc // called when token refreshed so new refresh token can be persisted
+}
+
+// Token returns the current token if it's still valid, else will
+// refresh the current token (using r.Context for HTTP client
+// information) and return the new one.
+func (s *NotifyRefreshTokenSource) Token() (*oauth2.Token, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.t.Valid() {
+		return s.t, nil
+	}
+	t, err := s.new.Token()
+	if err != nil {
+		return nil, err
+	}
+	s.t = t
+	return t, s.f(t)
 }
