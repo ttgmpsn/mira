@@ -92,6 +92,13 @@ func (c *Reddit) CodeAuth(code string) error {
 	return nil
 }
 
+// SetToken manually assigns a token to the Reddit object.
+// This is useful if you have your token information saved from a prior run.
+func (c *Reddit) SetToken(t *oauth2.Token, scopes []string) {
+	c.OAuthConfig.Scopes = scopes
+	c.Client = c.OAuthConfig.Client(c.ctx, t)
+}
+
 // SetDefault gets sensible default values for streams.
 func (c *Reddit) SetDefault() {
 	c.Values = RedditVals{
