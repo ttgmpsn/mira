@@ -53,6 +53,7 @@ func newOAuthSession(creds Credentials) *Reddit {
 
 // LoginAuth creates the required HTTP client with a new token.
 // Creds are taken from the data provided to NewOAuthSession.
+// Tokens are refreshed automatically shortly before the session runs out.
 func (c *Reddit) LoginAuth() error {
 	if len(c.creds.Username) == 0 || len(c.creds.Password) == 0 {
 		return errors.New("no username or password provided to NewOAuthSession")
@@ -72,7 +73,13 @@ func (c *Reddit) LoginAuth() error {
 		}
 		return errors.New(msg)
 	}
-	c.Client = c.OAuthConfig.Client(c.ctx, t)
+
+	ts := &loginAuthRefreshTokenSource{
+		t: t,
+		c: c,
+	}
+
+	c.Client = oauth2.NewClient(c.ctx, ts)
 	return nil
 }
 
@@ -160,4 +167,40 @@ func (s *NotifyRefreshTokenSource) Token() (*oauth2.Token, error) {
 	}
 	s.t = t
 	return t, s.f(t)
+}
+
+// loginAuthRefreshTokenSource is essentially `oauth2.ResuseTokenSource`
+// that re-logins every time the token runs out.
+type loginAuthRefreshTokenSource struct {
+	mu sync.Mutex // guards t
+	t  *oauth2.Token
+	c  *Reddit
+}
+
+// Token returns the current token if it's still valid, else will
+// refresh the current token (using r.Context for HTTP client
+// information) and return the new one.
+func (s *loginAuthRefreshTokenSource) Token() (*oauth2.Token, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.t.Valid() {
+		return s.t, nil
+	}
+
+	// Fetch OAuth token.
+	t, err := s.c.OAuthConfig.PasswordCredentialsToken(s.c.ctx, s.c.creds.Username, s.c.creds.Password)
+	if err != nil {
+		return nil, err
+	}
+	if !t.Valid() {
+		msg := "Invalid OAuth token"
+		if t != nil {
+			if extra := t.Extra("error"); extra != nil {
+				msg = fmt.Sprintf("%s: %s", msg, extra)
+			}
+		}
+		return nil, errors.New(msg)
+	}
+	s.t = t
+	return t, nil
 }
