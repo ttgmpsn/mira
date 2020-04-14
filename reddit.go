@@ -593,6 +593,23 @@ func (c *Reddit) Approve() error {
 	return err
 }
 
+// Remove mod-removes the last queued object. To remove own comments,
+// please use Delete()
+// Valid objects: Comment, Post
+func (c *Reddit) Remove(spam bool) error {
+	name, _, err := c.checkType(models.KComment, models.KPost)
+	if err != nil {
+		return err
+	}
+	target := RedditOauth + "/api/remove"
+	_, err = c.MiraRequest("POST", target, map[string]string{
+		"id":       name,
+		"spam":     strconv.FormatBool(spam),
+		"api_type": "json",
+	})
+	return err
+}
+
 // Distinguish the last queued object.
 // Valid objects: Comment
 func (c *Reddit) Distinguish(how string, sticky bool) error {

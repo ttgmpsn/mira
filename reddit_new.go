@@ -86,3 +86,24 @@ func (c *Reddit) ModLog(limit int, mod string) ([]*models.ModAction, error) {
 
 	return ret, nil
 }
+
+// Ban bans a redditor from last queued object.
+// Valid objects: Subreddit
+// uReddit.Subreddit(sn.Subreddit).Ban(meta.Username, banDays, meta.ThingID, values["ban-note"], values["ban-reason"])
+func (c *Reddit) Ban(redditor string, days int, context, message, reason string) error {
+	subreddit, _, err := c.checkType(models.KSubreddit)
+	if err != nil {
+		return err
+	}
+	target := RedditOauth + "/r/" + subreddit + "/api/friend"
+	_, err = c.MiraRequest("POST", target, map[string]string{
+		"name":        redditor,
+		"duration":    strconv.Itoa(days),
+		"ban_context": context,
+		"ban_message": message,
+		"ban_reason":  reason,
+		"note":        reason,
+		"api_type":    "json",
+	})
+	return err
+}
