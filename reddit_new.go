@@ -104,6 +104,7 @@ func (c *Reddit) Ban(redditor string, days int, context, message, reason string)
 		"ban_reason":  reason,
 		"note":        reason,
 		"api_type":    "json",
+		"type":        "banned",
 	})
 	return err
 }
