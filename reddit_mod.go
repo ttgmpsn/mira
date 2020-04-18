@@ -1,37 +1,80 @@
 package mira
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 
 	"github.com/ttgmpsn/mira/models"
 )
 
-// Wiki returns a wiki page from last queued object.
-// Valid objects: Subreddit
-func (c *Reddit) Wiki(page string) (*models.Wiki, error) {
-	sr, ttype := c.getQueue()
-	if ttype != models.KSubreddit {
-		return nil, fmt.Errorf("'%s' type does not have an option for wiki", ttype)
-	}
-
-	target := RedditOauth + "/r/" + sr + "/wiki/" + page + ".json"
-	ans, err := c.MiraRequest("GET", target, map[string]string{})
+// Approve the last queued object.
+// Valid objects: Comment, Post
+func (c *Reddit) Approve() error {
+	name, _, err := c.checkType(models.KComment, models.KPost)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	ret := &models.Response{}
-	if err := json.Unmarshal([]byte(ans), ret); err != nil {
-		return nil, err
-	}
+	target := RedditOauth + "/api/approve"
+	_, err = c.MiraRequest("POST", target, map[string]string{
+		"id":       name,
+		"api_type": "json",
+	})
+	return err
+}
 
-	wiki, ok := ret.Data.(*models.Wiki)
-	if !ok {
-		return nil, fmt.Errorf("couldn't convert to Wiki struct")
+// Remove mod-removes the last queued object. To remove own comments,
+// please use Delete()
+// Valid objects: Comment, Post
+func (c *Reddit) Remove(spam bool) error {
+	name, _, err := c.checkType(models.KComment, models.KPost)
+	if err != nil {
+		return err
 	}
+	target := RedditOauth + "/api/remove"
+	_, err = c.MiraRequest("POST", target, map[string]string{
+		"id":       name,
+		"spam":     strconv.FormatBool(spam),
+		"api_type": "json",
+	})
+	return err
+}
 
-	return wiki, nil
+// Distinguish the last queued object.
+// Valid objects: Comment
+func (c *Reddit) Distinguish(how string, sticky bool) error {
+	name, _, err := c.checkType(models.KComment)
+	if err != nil {
+		return err
+	}
+	target := RedditOauth + "/api/distinguish"
+	_, err = c.MiraRequest("POST", target, map[string]string{
+		"id":       name,
+		"how":      how,
+		"sticky":   strconv.FormatBool(sticky),
+		"api_type": "json",
+	})
+	return err
+}
+
+// UpdateSidebar of the last queued object.
+// Valid objects: Subreddit
+func (c *Reddit) UpdateSidebar(text string) error {
+	name, _, err := c.checkType(models.KSubreddit)
+	if err != nil {
+		return err
+	}
+	target := RedditOauth + "/api/site_admin"
+	_, err = c.MiraRequest("POST", target, map[string]string{
+		"sr":          name,
+		"name":        "None",
+		"description": text,
+		"title":       name,
+		"wikimode":    "anyone",
+		"link_type":   "any",
+		"type":        "public",
+		"api_type":    "json",
+	})
+	return err
 }
 
 // ModQueue returns the mod queue from the last queued object.
