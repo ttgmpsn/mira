@@ -1,8 +1,8 @@
-#Fork of MIRA
+# Fork of MIRA
 
 For the original project by @thecsw, please see https://github.com/thecsw/mira/. It also has more extended documentation.
 
-###Why
+### Why
 
 While I liked the base of the original library, especially [mira/models](https://github.com/thecsw/mira/) was full of duplicate code. In this fork, I tried to tailor it down and have a more "go" approach at handling the different types of JSON data returned from Reddit, while minimizing duplicated code.
 
