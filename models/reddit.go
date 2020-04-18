@@ -3,11 +3,63 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
+	"strings"
 	"time"
 )
 
 // RedditID is a Reddit Thing ID (tX_XXXXX)
 type RedditID string
+
+// UnmarshalJSON defines an Unmarshaller for RedditID
+// This is mainly used to convert int values (used in New Modmail responses) to the base36 one used elsewhere.
+func (r *RedditID) UnmarshalJSON(data []byte) error {
+	var t interface{}
+	err := json.Unmarshal(data, &t)
+	if err != nil {
+		return err
+	}
+	switch v := t.(type) {
+	case string:
+		*r = RedditID(v)
+		return nil
+	case int64:
+		// Only known to be used for authors
+		*r = RedditID("t2_" + big.NewInt(v).Text(36))
+		return nil
+	case float64:
+		// Only known to be used for authors
+		f := big.NewFloat(v)
+		i, _ := f.Int(nil)
+		*r = RedditID("t2_" + i.Text(36))
+		return nil
+	}
+
+	return fmt.Errorf("Unknown type for RedditID")
+}
+
+// Type returns the RedditKind to a RedditID
+func (r RedditID) Type() RedditKind {
+	s := string(r)
+	switch strings.ToLower(s[:strings.IndexByte(s, '_')]) {
+	case "t1":
+		return KComment
+	case "t2":
+		return KRedditor
+	case "t3":
+		return KPost
+	case "t4":
+		return KMessage
+	case "t5":
+		return KSubreddit
+	case "t6":
+		return KAward
+	case "modaction":
+		return KModAction
+	default:
+		return KUnknown
+	}
+}
 
 // RedditKind defines the type of of a Reddit ID (tX)
 type RedditKind string
@@ -23,28 +75,6 @@ const (
 	KModAction RedditKind = "modaction"
 	KUnknown   RedditKind = "tX"
 )
-
-// Type returns the RedditKind to a RedditID
-func (id RedditID) Type() RedditKind {
-	switch id[:3] {
-	case "t1_":
-		return KComment
-	case "t2_":
-		return KRedditor
-	case "t3_":
-		return KPost
-	case "t4_":
-		return KMessage
-	case "t5_":
-		return KSubreddit
-	case "t6_":
-		return KAward
-	case "modaction":
-		return KModAction
-	default:
-		return KUnknown
-	}
-}
 
 type responseType string
 

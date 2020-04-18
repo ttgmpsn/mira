@@ -1,6 +1,7 @@
 package mira
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -132,7 +133,6 @@ func (c *Reddit) ModLog(limit int, mod string) ([]*models.ModAction, error) {
 
 // Ban bans a redditor from last queued object.
 // Valid objects: Subreddit
-// uReddit.Subreddit(sn.Subreddit).Ban(meta.Username, banDays, meta.ThingID, values["ban-note"], values["ban-reason"])
 func (c *Reddit) Ban(redditor string, days int, context, message, reason string) error {
 	subreddit, _, err := c.checkType(models.KSubreddit)
 	if err != nil {
@@ -150,4 +150,20 @@ func (c *Reddit) Ban(redditor string, days int, context, message, reason string)
 		"type":        "banned",
 	})
 	return err
+}
+
+// GetModMailByID returns the ModMail Conversation for a given modmail ID
+func (c *Reddit) GetModMailByID(conversationID string, markRead bool) (*models.NewModmailConversation, error) {
+	target := RedditOauth + "/api/mod/conversations/" + conversationID
+	ans, err := c.MiraRequest("GET", target, map[string]string{
+		"markRead": strconv.FormatBool(markRead),
+	})
+	if err != nil {
+		return nil, err
+	}
+	ret := &models.NewModmailConversation{}
+	if err := json.Unmarshal([]byte(ans), ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
 }
