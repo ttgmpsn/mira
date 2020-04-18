@@ -33,9 +33,12 @@ func (r *RedditID) UnmarshalJSON(data []byte) error {
 		i, _ := f.Int(nil)
 		*r = RedditID("t2_" + i.Text(36))
 		return nil
+	case nil:
+		r = nil
+		return nil
 	}
 
-	return fmt.Errorf("Unknown type for RedditID")
+	return fmt.Errorf("Unknown type for RedditID %v", t)
 }
 
 // Type returns the RedditKind to a RedditID
