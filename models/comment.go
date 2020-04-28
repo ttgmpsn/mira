@@ -60,8 +60,12 @@ func (c Comment) GetBanned() SubModAction {
 
 // GetApproved returns the mod & time who approved the Comment
 func (c Comment) GetApproved() SubModAction {
+	app := string(c.ApprovedBy)
+	if app == "false" || app == "null" {
+		app = ""
+	}
 	return SubModAction{
-		Mod: c.ApprovedBy,
+		Mod: app,
 		At:  time.Unix(int64(c.ApprovedAtUTC), 0),
 	}
 }

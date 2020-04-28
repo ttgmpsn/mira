@@ -54,8 +54,12 @@ func (p Post) GetBanned() SubModAction {
 
 // GetApproved returns the mod & time who approved the Post
 func (p Post) GetApproved() SubModAction {
+	app := string(p.ApprovedBy)
+	if app == "false" || app == "null" {
+		app = ""
+	}
 	return SubModAction{
-		Mod: p.ApprovedBy,
+		Mod: app,
 		At:  time.Unix(int64(p.ApprovedAtUTC), 0),
 	}
 }
