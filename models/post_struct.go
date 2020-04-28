@@ -52,7 +52,7 @@ type Post struct {
 	ModNote                    string              `json:"mod_note"`
 	Created                    float64             `json:"created"`
 	LinkFlairType              string              `json:"link_flair_type"`
-	BannedBy                   string              `json:"banned_by"`
+	BannedBy                   json.RawMessage     `json:"banned_by"`
 	AuthorFlairType            string              `json:"author_flair_type"`
 	Domain                     string              `json:"domain"`
 	SelftextHTML               string              `json:"selftext_html"`

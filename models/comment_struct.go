@@ -9,7 +9,7 @@ type Comment struct {
 	ApprovedAtUTC              float64             `json:"approved_at_utc"`
 	Distinguished              string              `json:"distinguished"`
 	ModReasonBy                string              `json:"mod_reason_by"`
-	BannedBy                   string              `json:"banned_by"`
+	BannedBy                   json.RawMessage     `json:"banned_by"`
 	AuthorFlairType            string              `json:"author_flair_type"`
 	RemovalReason              string              `json:"removal_reason"`
 	LinkID                     RedditID            `json:"link_id"`

@@ -47,7 +47,7 @@ func (p Post) GetURL() string { return p.URL }
 // GetBanned returns the mod & time who deleted the Post
 func (p Post) GetBanned() SubModAction {
 	return SubModAction{
-		Mod: p.BannedBy,
+		Mod: string(p.BannedBy),
 		At:  time.Unix(int64(p.BannedAtUTC), 0),
 	}
 }
