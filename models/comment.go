@@ -52,8 +52,12 @@ func (c Comment) GetURL() string { return fmt.Sprintf("https://www.reddit.com%s"
 
 // GetBanned returns the mod & time who deleted the Comment
 func (c Comment) GetBanned() SubModAction {
+	app := string(c.BannedBy)
+	if app == "false" || app == "null" {
+		app = ""
+	}
 	return SubModAction{
-		Mod: string(c.BannedBy),
+		Mod: app,
 		At:  time.Unix(int64(c.BannedAtUTC), 0),
 	}
 }
