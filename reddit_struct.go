@@ -28,7 +28,7 @@ type Reddit struct {
 	UserAgent   string
 	ctx         context.Context
 
-	Chain  []chainVals
+	Chain  chan *chainVals
 	Values redditVals
 }
 

@@ -7,14 +7,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 
 	"github.com/ttgmpsn/mira/models"
-)
-
-var (
-	requestMutex *sync.RWMutex = &sync.RWMutex{}
-	queueMutex   *sync.RWMutex = &sync.RWMutex{}
 )
 
 // MiraRequest can be used to make custom requests to the reddit API.
@@ -29,9 +23,7 @@ func (c *Reddit) MiraRequest(method string, target string, payload map[string]st
 	if err != nil {
 		return nil, err
 	}
-	requestMutex.Lock()
 	response, err := c.Client.Do(r)
-	requestMutex.Unlock()
 	if err != nil {
 		return nil, err
 	}
@@ -63,32 +55,27 @@ func (c *Reddit) miraRequestListing(method string, target string, payload map[st
 
 // Me Redditor queues up the next action to be about the logged in user.
 func (c *Reddit) Me() *Reddit {
-	c.addQueue("", "me")
-	return c
+	return c.addQueue("", "me")
 }
 
 // Subreddit Redditor queues up the next action to be about one or multuple Subreddits.
 func (c *Reddit) Subreddit(name ...string) *Reddit {
-	c.addQueue(strings.Join(name, "+"), models.KSubreddit)
-	return c
+	return c.addQueue(strings.Join(name, "+"), models.KSubreddit)
 }
 
 // Post queues up the next action to be about a certain Post.
 func (c *Reddit) Post(name string) *Reddit {
-	c.addQueue(name, models.KPost)
-	return c
+	return c.addQueue(name, models.KPost)
 }
 
 // Comment queues up the next action to be about a certain comment.
 func (c *Reddit) Comment(name string) *Reddit {
-	c.addQueue(name, models.KComment)
-	return c
+	return c.addQueue(name, models.KComment)
 }
 
 // Redditor queues up the next action to be about a certain Redditor.
 func (c *Reddit) Redditor(name string) *Reddit {
-	c.addQueue(name, models.KRedditor)
-	return c
+	return c.addQueue(name, models.KRedditor)
 }
 
 // Posts gets posts for the last queued object.
@@ -183,20 +170,14 @@ func (c *Reddit) checkType(rtype ...models.RedditKind) (string, models.RedditKin
 	return name, ttype, nil
 }
 
-func (c *Reddit) addQueue(name string, ttype models.RedditKind) {
-	queueMutex.Lock()
-	defer queueMutex.Unlock()
-	c.Chain = append(c.Chain, chainVals{Name: name, Type: ttype})
+func (c *Reddit) addQueue(name string, ttype models.RedditKind) *Reddit {
+	c.Chain <- &chainVals{Name: name, Type: ttype}
+	return c
 }
 
 func (c *Reddit) getQueue() (string, models.RedditKind) {
-	queueMutex.Lock()
-	defer queueMutex.Unlock()
-	if len(c.Chain) < 1 {
-		return "", ""
-	}
-	defer func() { c.Chain = c.Chain[1:] }()
-	return c.Chain[0].Name, c.Chain[0].Type
+	next := <-c.Chain
+	return next.Name, next.Type
 }
 
 func findElem(elem models.RedditKind, arr []models.RedditKind) bool {
