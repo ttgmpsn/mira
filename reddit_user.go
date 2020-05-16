@@ -45,11 +45,11 @@ func (c *Reddit) getRedditorPosts(user string, sort string, tdur string, limit i
 	return ret, nil
 }
 
-func (c *Reddit) getRedditorPostsAfter(user string, last string, limit int) ([]*models.Post, error) {
+func (c *Reddit) getRedditorPostsAfter(user string, last models.RedditID, limit int) ([]*models.Post, error) {
 	target := RedditOauth + "/u/" + user + "/submitted/new.json"
 	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"limit":  strconv.Itoa(limit),
-		"before": last,
+		"before": string(last),
 	})
 	if err != nil {
 		return nil, err
@@ -86,12 +86,12 @@ func (c *Reddit) getRedditorComments(user string, sort string, tdur string, limi
 	return ret, nil
 }
 
-func (c *Reddit) getRedditorCommentsAfter(user string, sort string, last string, limit int) ([]*models.Comment, error) {
+func (c *Reddit) getRedditorCommentsAfter(user string, sort string, last models.RedditID, limit int) ([]*models.Comment, error) {
 	target := RedditOauth + "/u/" + user + "/comments.json"
 	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"sort":   sort,
 		"limit":  strconv.Itoa(limit),
-		"before": last,
+		"before": string(last),
 	})
 	if err != nil {
 		return nil, err

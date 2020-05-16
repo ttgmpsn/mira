@@ -94,7 +94,7 @@ func (c *Reddit) Posts(sort string, tdur string, limit int) ([]*models.Post, err
 
 // PostsAfter gets posts for the last queued object after a given item.
 // Valid objects: Subreddit, Redditor
-func (c *Reddit) PostsAfter(last string, limit int) ([]*models.Post, error) {
+func (c *Reddit) PostsAfter(last models.RedditID, limit int) ([]*models.Post, error) {
 	name, ttype := c.getQueue()
 	switch ttype {
 	case models.KSubreddit:
@@ -147,12 +147,12 @@ func (c *Reddit) Info() (models.RedditThing, error) {
 
 // CommentsAfter gets comments for the last queued object after a given item.
 // Valid objects: Subreddit, Redditor
-func (c *Reddit) CommentsAfter(sort string, last string, limit int) ([]*models.Comment, error) {
+func (c *Reddit) CommentsAfter(sort string, last models.RedditID, limit int) ([]*models.Comment, error) {
 	name, ttype := c.getQueue()
 	switch ttype {
-	case "subreddit":
+	case models.KSubreddit:
 		return c.getSubredditCommentsAfter(name, sort, last, limit)
-	case "redditor":
+	case models.KRedditor:
 		return c.getRedditorCommentsAfter(name, sort, last, limit)
 	default:
 		return nil, fmt.Errorf("'%s' type does not have an option for comments", ttype)

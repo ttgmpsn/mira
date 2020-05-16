@@ -81,11 +81,11 @@ func (c *Reddit) getSubredditComments(sr string, sort string, tdur string, limit
 // Limit is any numerical value, so 0 <= limit <= 100
 //
 // Anchor options are submissions full thing, for example: t3_bqqwm3
-func (c *Reddit) getSubredditPostsAfter(sr string, last string, limit int) ([]*models.Post, error) {
+func (c *Reddit) getSubredditPostsAfter(sr string, last models.RedditID, limit int) ([]*models.Post, error) {
 	target := RedditOauth + "/r/" + sr + "/new.json"
 	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"limit":  strconv.Itoa(limit),
-		"before": last,
+		"before": string(last),
 	})
 	if err != nil {
 		return nil, err
@@ -101,12 +101,12 @@ func (c *Reddit) getSubredditPostsAfter(sr string, last string, limit int) ([]*m
 	return ret, nil
 }
 
-func (c *Reddit) getSubredditCommentsAfter(sr string, sort string, last string, limit int) ([]*models.Comment, error) {
+func (c *Reddit) getSubredditCommentsAfter(sr string, sort string, last models.RedditID, limit int) ([]*models.Comment, error) {
 	target := RedditOauth + "/r/" + sr + "/comments.json"
 	list, err := c.miraRequestListing("GET", target, map[string]string{
 		"sort":   sort,
 		"limit":  strconv.Itoa(limit),
-		"before": last,
+		"before": string(last),
 	})
 	if err != nil {
 		return nil, err
