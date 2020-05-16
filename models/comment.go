@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -52,24 +53,21 @@ func (c Comment) GetURL() string { return fmt.Sprintf("https://www.reddit.com%s"
 
 // GetBanned returns the mod & time who deleted the Comment
 func (c Comment) GetBanned() SubModAction {
-	app := string(c.BannedBy)
-	if app == "false" || app == "null" {
-		app = ""
+	var mod string
+	err := json.Unmarshal(c.BannedBy, &mod)
+	if err != nil {
+		mod = ""
 	}
 	return SubModAction{
-		Mod: app,
+		Mod: mod,
 		At:  time.Unix(int64(c.BannedAtUTC), 0),
 	}
 }
 
 // GetApproved returns the mod & time who approved the Comment
 func (c Comment) GetApproved() SubModAction {
-	app := string(c.ApprovedBy)
-	if app == "false" || app == "null" {
-		app = ""
-	}
 	return SubModAction{
-		Mod: app,
+		Mod: c.ApprovedBy,
 		At:  time.Unix(int64(c.ApprovedAtUTC), 0),
 	}
 }

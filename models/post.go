@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // GetID returns the RedditID of the Post
 func (p Post) GetID() RedditID { return p.Name }
@@ -46,24 +49,21 @@ func (p Post) GetURL() string { return p.URL }
 
 // GetBanned returns the mod & time who deleted the Post
 func (p Post) GetBanned() SubModAction {
-	app := string(p.BannedBy)
-	if app == "false" || app == "null" {
-		app = ""
+	var mod string
+	err := json.Unmarshal(p.BannedBy, &mod)
+	if err != nil {
+		mod = ""
 	}
 	return SubModAction{
-		Mod: app,
+		Mod: mod,
 		At:  time.Unix(int64(p.BannedAtUTC), 0),
 	}
 }
 
 // GetApproved returns the mod & time who approved the Post
 func (p Post) GetApproved() SubModAction {
-	app := string(p.ApprovedBy)
-	if app == "false" || app == "null" {
-		app = ""
-	}
 	return SubModAction{
-		Mod: app,
+		Mod: p.ApprovedBy,
 		At:  time.Unix(int64(p.ApprovedAtUTC), 0),
 	}
 }

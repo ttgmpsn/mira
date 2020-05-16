@@ -81,7 +81,7 @@ type Post struct {
 	AuthorFlairText          string      `json:"author_flair_text"`
 	Visited                  bool        `json:"visited"`
 	NumReports               int         `json:"num_reports"`
-	Distinguished            bool        `json:"distinguished"`
+	Distinguished            string      `json:"distinguished"`
 	SubredditID              RedditID    `json:"subreddit_id"`
 	ModReasonBy              string      `json:"mod_reason_by"`
 	RemovalReason            string      `json:"removal_reason"`
