@@ -1,6 +1,7 @@
 package mira
 
 import (
+	"container/ring"
 	"fmt"
 	"time"
 
@@ -56,10 +57,10 @@ func (c *Reddit) streamSubredditComments(name string) (*SubmissionStream, error)
 	}
 	var last models.RedditID
 	go func() {
+		sent := ring.New(100)
 		for {
 			select {
 			case <-s.Close:
-				close(sendC)
 				return
 			default:
 			}
@@ -69,8 +70,17 @@ func (c *Reddit) streamSubredditComments(name string) (*SubmissionStream, error)
 				return
 			}
 			for i := len(comments) - 1; i >= 0; i-- {
+				if ringContains(sent, comments[i].GetID()) {
+					continue
+				}
 				sendC <- comments[i]
-				last = comments[i].GetID()
+				sent.Value = comments[i].GetID()
+				sent = sent.Next()
+			}
+			if len(comments) == 0 {
+				last = ""
+			} else if len(comments) > 2 {
+				last = comments[1].GetID()
 			}
 			time.Sleep(45 * time.Second)
 		}
@@ -90,6 +100,7 @@ func (c *Reddit) streamSubredditPosts(name string) (*SubmissionStream, error) {
 	}
 	var last models.RedditID
 	go func() {
+		sent := ring.New(100)
 		for {
 			select {
 			case <-s.Close:
@@ -102,11 +113,34 @@ func (c *Reddit) streamSubredditPosts(name string) (*SubmissionStream, error) {
 				return
 			}
 			for i := len(posts) - 1; i >= 0; i-- {
+				if ringContains(sent, posts[i].GetID()) {
+					continue
+				}
 				sendC <- posts[i]
-				last = posts[i].GetID()
+				sent.Value = posts[i].GetID()
+				sent = sent.Next()
+			}
+			if len(posts) == 0 {
+				last = ""
+			} else if len(posts) > 2 {
+				last = posts[1].GetID()
 			}
 			time.Sleep(45 * time.Second)
 		}
 	}()
 	return s, nil
+}
+
+func ringContains(r *ring.Ring, n models.RedditID) bool {
+	ret := false
+	r.Do(func(p interface{}) {
+		if p == nil {
+			return
+		}
+		i := p.(models.RedditID)
+		if i == n {
+			ret = true
+		}
+	})
+	return ret
 }
