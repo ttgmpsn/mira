@@ -51,6 +51,9 @@ func (c Comment) IsAuthor() bool { return c.IsSubmitter }
 // GetURL returns the link to the Comment
 func (c Comment) GetURL() string { return fmt.Sprintf("https://www.reddit.com%s", c.Permalink) }
 
+// GetCreated returns the creation date of the Comment
+func (c Comment) GetCreated() time.Time { return time.Unix(int64(c.CreatedUTC), 0) }
+
 // GetBanned returns the mod & time who deleted the Comment
 func (c Comment) GetBanned() SubModAction {
 	var mod string

@@ -47,6 +47,9 @@ func (p Post) GetTitle() string { return p.Title }
 // GetURL returns the link to the Post
 func (p Post) GetURL() string { return p.URL }
 
+// GetCreated returns the creation date of the Post
+func (p Post) GetCreated() time.Time { return time.Unix(int64(p.CreatedUTC), 0) }
+
 // GetBanned returns the mod & time who deleted the Post
 func (p Post) GetBanned() SubModAction {
 	var mod string

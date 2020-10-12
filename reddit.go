@@ -189,6 +189,30 @@ func findElem(elem models.RedditKind, arr []models.RedditKind) bool {
 	return false
 }
 
+// Submissions gets submissions for the last queued object.
+// Valid objects: Redditor
+func (c *Reddit) Submissions(limit int) ([]models.Submission, error) {
+	name, ttype := c.getQueue()
+	switch ttype {
+	case models.KRedditor:
+		return c.getRedditorSubmissions(name, limit)
+	default:
+		return nil, fmt.Errorf("'%s' type does not have an option for submissions", ttype)
+	}
+}
+
+// SubmissionsAfter gets submissions for the last queued object after a given item.
+// Valid objects: Redditor
+func (c *Reddit) SubmissionsAfter(last models.RedditID, limit int) ([]models.Submission, error) {
+	name, ttype := c.getQueue()
+	switch ttype {
+	case models.KRedditor:
+		return c.getRedditorSubmissionsAfter(name, last, limit)
+	default:
+		return nil, fmt.Errorf("'%s' type does not have an option for submissionsafter", ttype)
+	}
+}
+
 // RedditErr is an error returned from the Reddit API.
 type RedditErr struct {
 	Message string `json:"message"`

@@ -138,17 +138,20 @@ func (c *Reddit) Ban(redditor string, days int, context, message, reason string)
 	if err != nil {
 		return err
 	}
-	target := RedditOauth + "/r/" + subreddit + "/api/friend"
-	_, err = c.MiraRequest("POST", target, map[string]string{
+	args := map[string]string{
 		"name":        redditor,
-		"duration":    strconv.Itoa(days),
 		"ban_context": context,
 		"ban_message": message,
 		"ban_reason":  reason,
 		"note":        reason,
 		"api_type":    "json",
 		"type":        "banned",
-	})
+	}
+	if days != 0 {
+		args["duration"] = strconv.Itoa(days)
+	}
+	target := RedditOauth + "/r/" + subreddit + "/api/friend"
+	_, err = c.MiraRequest("POST", target, args)
 	return err
 }
 

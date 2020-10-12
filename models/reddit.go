@@ -139,6 +139,7 @@ type Submission interface {
 	GetBody() string
 	GetScore() int
 	IsSticky() bool
+	GetCreated() time.Time
 	// Mod Stuff
 	IsRemoved() bool
 	IsApproved() bool

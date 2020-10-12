@@ -34,7 +34,7 @@ type Comment struct {
 	AuthorFullname             RedditID            `json:"author_fullname"`
 	ApprovedBy                 string              `json:"approved_by"`
 	ModNote                    string              `json:"mod_note"`
-	AllAwardings               []string            `json:"all_awardings"`
+	AllAwardings               []PostAward         `json:"all_awardings"`
 	SubredditID                RedditID            `json:"subreddit_id"`
 	Body                       string              `json:"body"`
 	Edited                     json.RawMessage     `json:"edited"` // bool or float64

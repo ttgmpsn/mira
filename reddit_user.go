@@ -48,8 +48,8 @@ func (c *Reddit) getRedditorPosts(user string, sort string, tdur string, limit i
 func (c *Reddit) getRedditorPostsAfter(user string, last models.RedditID, limit int) ([]*models.Post, error) {
 	target := RedditOauth + "/u/" + user + "/submitted/new.json"
 	list, err := c.miraRequestListing("GET", target, map[string]string{
-		"limit":  strconv.Itoa(limit),
-		"before": string(last),
+		"limit": strconv.Itoa(limit),
+		"after": string(last),
 	})
 	if err != nil {
 		return nil, err
@@ -89,9 +89,9 @@ func (c *Reddit) getRedditorComments(user string, sort string, tdur string, limi
 func (c *Reddit) getRedditorCommentsAfter(user string, sort string, last models.RedditID, limit int) ([]*models.Comment, error) {
 	target := RedditOauth + "/u/" + user + "/comments.json"
 	list, err := c.miraRequestListing("GET", target, map[string]string{
-		"sort":   sort,
-		"limit":  strconv.Itoa(limit),
-		"before": string(last),
+		"sort":  sort,
+		"limit": strconv.Itoa(limit),
+		"after": string(last),
 	})
 	if err != nil {
 		return nil, err
@@ -101,6 +101,45 @@ func (c *Reddit) getRedditorCommentsAfter(user string, sort string, last models.
 	for _, comment := range list.Children {
 		if c, ok := comment.Data.(*models.Comment); ok {
 			ret = append(ret, c)
+		}
+	}
+
+	return ret, nil
+}
+
+func (c *Reddit) getRedditorSubmissions(user string, limit int) ([]models.Submission, error) {
+	target := RedditOauth + "/u/" + user + ".json"
+	list, err := c.miraRequestListing("GET", target, map[string]string{
+		"limit": strconv.Itoa(limit),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []models.Submission{}
+	for _, submission := range list.Children {
+		if s, ok := submission.Data.(models.Submission); ok {
+			ret = append(ret, s)
+		}
+	}
+
+	return ret, nil
+}
+
+func (c *Reddit) getRedditorSubmissionsAfter(user string, last models.RedditID, limit int) ([]models.Submission, error) {
+	target := RedditOauth + "/u/" + user + ".json"
+	list, err := c.miraRequestListing("GET", target, map[string]string{
+		"limit": strconv.Itoa(limit),
+		"after": string(last),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []models.Submission{}
+	for _, comment := range list.Children {
+		if s, ok := comment.Data.(models.Submission); ok {
+			ret = append(ret, s)
 		}
 	}
 
