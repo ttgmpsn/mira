@@ -1,6 +1,6 @@
 # Fork of MIRA
 
-For the original project by @thecsw, please see https://github.com/thecsw/mira/. It also has more extended documentation.
+For the original project by @thecsw, please see https://github.com/thecsw/mira/.
 
 ### Why
 
