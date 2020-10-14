@@ -128,8 +128,8 @@ func (c *Reddit) SubmissionInfoID(name models.RedditID) (models.Submission, erro
 
 // Submit submits a new Post to the last queued object.
 // Valid objects: Subreddit
-func (c *Reddit) Submit(title string, text string) (*models.Post, error) {
-	ret := &models.Post{}
+func (c *Reddit) Submit(title string, text string) (*models.PostActionResponse, error) {
+	ret := &models.PostActionResponse{}
 	name, _, err := c.checkType(models.KSubreddit)
 	if err != nil {
 		return nil, err
@@ -143,15 +143,13 @@ func (c *Reddit) Submit(title string, text string) (*models.Post, error) {
 		"resubmit": "true",
 		"api_type": "json",
 	})
-	// :TODO: check reply type
-	fmt.Println(string(ans))
 	json.Unmarshal(ans, ret)
 	return ret, err
 }
 
 // Reply adds a comment to the last queued object.
 // Valid objects: Comment, Post
-func (c *Reddit) Reply(text string) (*models.ActionResponse, error) {
+func (c *Reddit) Reply(text string) (*models.CommentActionResponse, error) {
 	name, _, err := c.checkType(models.KComment, models.KPost)
 	if err != nil {
 		return nil, err
@@ -160,8 +158,8 @@ func (c *Reddit) Reply(text string) (*models.ActionResponse, error) {
 }
 
 // ReplyWithID adds a comment to the given thing id, without it needing to be queued up.
-func (c *Reddit) ReplyWithID(name, text string) (*models.ActionResponse, error) {
-	ret := &models.ActionResponse{}
+func (c *Reddit) ReplyWithID(name, text string) (*models.CommentActionResponse, error) {
+	ret := &models.CommentActionResponse{}
 	target := RedditOauth + "/api/comment"
 	ans, err := c.MiraRequest("POST", target, map[string]string{
 		"text":     text,

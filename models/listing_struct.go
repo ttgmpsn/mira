@@ -54,12 +54,23 @@ func (r *RedditElement) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(m.Data, r.Data)
 }
 
-// ActionResponse is returned by reddit when you actively do something (create a comment, for example)
-type ActionResponse struct {
+// CommentActionResponse is returned by reddit when you create a comment (new or reply)
+type CommentActionResponse struct {
 	JSON struct {
 		Errors []string `json:"errors"`
 		Data   struct {
 			Things []RedditElement `json:"things"`
+		}
+	} `json:"json"`
+}
+
+// PostActionResponse is returned by reddit when you create a post
+type PostActionResponse struct {
+	JSON struct {
+		Errors []string `json:"errors"`
+		Data   struct {
+			Name RedditID `json:"name"`
+			URL  string   `json:"url"`
 		}
 	} `json:"json"`
 }
