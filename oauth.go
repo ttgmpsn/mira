@@ -15,7 +15,6 @@ type transport struct {
 	useragent string
 }
 
-// Any request headers can be modified here.
 func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error) {
 	req.Header.Set("User-Agent", t.useragent)
 	return t.RoundTripper.RoundTrip(req)
@@ -24,8 +23,8 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 // Taken mostly from https://github.com/jzelinskie/geddit/blob/master/oauth_session.go
 // Thanks geddit :)
 
-// NewOAuthSession creates a new session for those who want to log into a
-// reddit account via OAuth. Please use Init() instead of calling this function.
+// newOAuthSession creates a new session for those who want to log into a
+// reddit account via OAuth.
 func newOAuthSession(creds Credentials) *Reddit {
 	r := &Reddit{creds: creds}
 
@@ -52,11 +51,11 @@ func newOAuthSession(creds Credentials) *Reddit {
 }
 
 // LoginAuth creates the required HTTP client with a new token.
-// Creds are taken from the data provided to NewOAuthSession.
+// Creds are taken from the data provided to Init.
 // Tokens are refreshed automatically shortly before the session runs out.
 func (c *Reddit) LoginAuth() error {
 	if len(c.creds.Username) == 0 || len(c.creds.Password) == 0 {
-		return errors.New("no username or password provided to NewOAuthSession")
+		return errors.New("no username or password provided to Init")
 	}
 
 	// Fetch OAuth token.
@@ -90,7 +89,7 @@ func (c *Reddit) AuthCodeURL(state string, scopes []string) string {
 }
 
 // CodeAuth creates and sets a token using an authentication code returned from AuthCodeURL.
-// Note that Username & Password provided to NewOAuthSession are ignored.
+// Note that Username & Password provided to Init are ignored.
 // You can optionally pass a TokenNotifyFunc to get notified when the token changes (i.e. to
 // store it into a database). Pass nil if you do not want to use this.
 func (c *Reddit) CodeAuth(code string, f TokenNotifyFunc) error {
@@ -144,7 +143,7 @@ type contextKey struct{}
 
 var tokenNotifyFuncKey contextKey
 
-// NotifyRefreshTokenSource is essentially `oauth2.ResuseTokenSource` with `TokenNotifyFunc` added.
+// NotifyRefreshTokenSource is essentially oauth2.ResuseTokenSource with TokenNotifyFunc added.
 type NotifyRefreshTokenSource struct {
 	new oauth2.TokenSource
 	mu  sync.Mutex // guards t
