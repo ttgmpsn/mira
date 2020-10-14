@@ -53,12 +53,12 @@ func (c *Reddit) miraRequestListing(method string, target string, payload map[st
 	return list, nil
 }
 
-// Me Redditor queues up the next action to be about the logged in user.
+// Me queues up the next action to be about the logged in user.
 func (c *Reddit) Me() *Reddit {
 	return c.addQueue("", "me")
 }
 
-// Subreddit Redditor queues up the next action to be about one or multuple Subreddits.
+// Subreddit queues up the next action to be about one or multuple Subreddits.
 func (c *Reddit) Subreddit(name ...string) *Reddit {
 	return c.addQueue(strings.Join(name, "+"), models.KSubreddit)
 }
