@@ -1,6 +1,6 @@
 package models
 
-// ModAction has details about stuff a moderator bit. Usually bad stuff.
+// ModAction has details about stuff a moderator did. Usually bad stuff.
 type ModAction struct {
 	Description           string   `json:"description"`
 	TargetBody            string   `json:"target_body"`

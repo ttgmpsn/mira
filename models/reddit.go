@@ -82,8 +82,9 @@ const (
 type responseType string
 
 const (
-	rListing responseType = "Listing"
-	rWiki    responseType = "wikipage"
+	rListing    responseType = "Listing"
+	rWiki       responseType = "wikipage"
+	rStylesheet responseType = "stylesheet"
 )
 
 // Response is a reply from the reddit API.
@@ -110,6 +111,8 @@ func (r *Response) UnmarshalJSON(data []byte) error {
 		r.Data = &Listing{}
 	case rWiki:
 		r.Data = &Wiki{}
+	case rStylesheet:
+		r.Data = &Stylesheet{}
 	default:
 		return fmt.Errorf("%q is an invalid ResponseType", m.Kind)
 	}

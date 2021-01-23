@@ -163,3 +163,29 @@ func (c *Reddit) Wiki(page string) (*models.Wiki, error) {
 
 	return wiki, nil
 }
+
+// Stylesheet returns the stylesheet & images from last queued object.
+// Valid objects: Subreddit
+func (c *Reddit) Stylesheet() (*models.Stylesheet, error) {
+	sr, ttype := c.getQueue()
+	if ttype != models.KSubreddit {
+		return nil, fmt.Errorf("'%s' type does not have an option for stylesheet", ttype)
+	}
+
+	target := RedditOauth + "/r/" + sr + "/about/stylesheet.json"
+	ans, err := c.MiraRequest("GET", target, map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+	ret := &models.Response{}
+	if err := json.Unmarshal([]byte(ans), ret); err != nil {
+		return nil, err
+	}
+
+	stylesheet, ok := ret.Data.(*models.Stylesheet)
+	if !ok {
+		return nil, fmt.Errorf("couldn't convert to Wiki struct")
+	}
+
+	return stylesheet, nil
+}
