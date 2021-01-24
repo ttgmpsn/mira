@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/ttgmpsn/mira/models"
@@ -13,13 +14,21 @@ import (
 
 // MiraRequest can be used to make custom requests to the reddit API.
 func (c *Reddit) MiraRequest(method string, target string, payload map[string]string) ([]byte, error) {
-	values := "?"
+	values := url.Values{}
 	for i, v := range payload {
-		v = url.QueryEscape(v)
-		values += fmt.Sprintf("%s=%s&", i, v)
+		values.Set(i, v)
 	}
-	values = values[:len(values)-1]
-	r, err := http.NewRequest(method, target+values, nil)
+
+	var r *http.Request
+	var err error
+	if method == "GET" {
+		values := fmt.Sprintf("?%s", values.Encode())
+		r, err = http.NewRequest(method, target+values, nil)
+	} else {
+		r, err = http.NewRequest(method, target, strings.NewReader(values.Encode()))
+		r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		r.Header.Add("Content-Length", strconv.Itoa(len(values.Encode())))
+	}
 	if err != nil {
 		return nil, err
 	}
