@@ -164,6 +164,26 @@ func (c *Reddit) Wiki(page string) (*models.Wiki, error) {
 	return wiki, nil
 }
 
+// EditWiki edits/creates a wiki page from last queued object.
+// Valid objects: Subreddit
+func (c *Reddit) EditWiki(page, content, reason string) error {
+	sr, ttype := c.getQueue()
+	if ttype != models.KSubreddit {
+		return fmt.Errorf("'%s' type does not have an option for editwiki", ttype)
+	}
+
+	target := RedditOauth + "/r/" + sr + "/api/wiki/edit"
+	_, err := c.MiraRequest("POST", target, map[string]string{
+		"content": content,
+		"page":    page,
+		"reason":  reason,
+	})
+
+	// API returns {}
+
+	return err
+}
+
 // Stylesheet returns the stylesheet & images from last queued object.
 // Valid objects: Subreddit
 func (c *Reddit) Stylesheet() (*models.Stylesheet, error) {
