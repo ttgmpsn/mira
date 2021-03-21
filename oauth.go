@@ -127,13 +127,6 @@ func (c *Reddit) SetToken(t *oauth2.Token, scopes []string, f TokenNotifyFunc) e
 	return nil
 }
 
-// SetDefault gets sensible default values for streams.
-func (c *Reddit) SetDefault() {
-	c.Values = redditVals{
-		GetSubmissionFromCommentTries: 32,
-	}
-}
-
 // TokenNotifyFunc is a function that accepts an oauth2 Token upon refresh, and
 // returns an error if it should not be used. Use this to cache Refresh Token
 // if you want to (you'll most likely want to).

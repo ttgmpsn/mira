@@ -9,3 +9,11 @@ func Init(c Credentials) *Reddit {
 	instance.SetDefault()
 	return instance
 }
+
+// SetDefault gets sensible default values for streams.
+func (c *Reddit) SetDefault() {
+	c.Values = redditVals{
+		CommentStreamInterval:    45,
+		SubmissionStreamInterval: 45,
+	}
+}

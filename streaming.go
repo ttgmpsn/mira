@@ -39,7 +39,7 @@ func (c *Reddit) StreamPosts() (*SubmissionStream, error) {
 	case models.KSubreddit:
 		return c.streamSubredditPosts(name)
 	/*case models.KRedditor:
-	return c.streamRedditorComments(name)*/
+	return c.streamRedditorPosts(name)*/
 	default:
 		return nil, fmt.Errorf("'%s' type does not have an option to stream posts", ttype)
 	}
@@ -82,7 +82,7 @@ func (c *Reddit) streamSubredditComments(name string) (*SubmissionStream, error)
 			} else if len(comments) > 2 {
 				last = comments[1].GetID()
 			}
-			time.Sleep(45 * time.Second)
+			time.Sleep(time.Duration(c.Values.CommentStreamInterval) * time.Second)
 		}
 	}()
 	return s, nil
@@ -125,7 +125,7 @@ func (c *Reddit) streamSubredditPosts(name string) (*SubmissionStream, error) {
 			} else if len(posts) > 2 {
 				last = posts[1].GetID()
 			}
-			time.Sleep(45 * time.Second)
+			time.Sleep(time.Duration(c.Values.SubmissionStreamInterval) * time.Second)
 		}
 	}()
 	return s, nil

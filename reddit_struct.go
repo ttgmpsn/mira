@@ -52,7 +52,8 @@ type Reddit struct {
 }
 
 type redditVals struct {
-	GetSubmissionFromCommentTries int
+	CommentStreamInterval    int
+	SubmissionStreamInterval int
 }
 
 type chainVals struct {
