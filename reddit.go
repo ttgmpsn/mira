@@ -180,12 +180,12 @@ func (c *Reddit) checkType(rtype ...models.RedditKind) (string, models.RedditKin
 }
 
 func (c *Reddit) addQueue(name string, ttype models.RedditKind) *Reddit {
-	c.Chain <- &chainVals{Name: name, Type: ttype}
+	c.chain <- &chainVals{Name: name, Type: ttype}
 	return c
 }
 
 func (c *Reddit) getQueue() (string, models.RedditKind) {
-	next := <-c.Chain
+	next := <-c.chain
 	return next.Name, next.Type
 }
 

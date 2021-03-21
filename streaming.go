@@ -18,6 +18,7 @@ type SubmissionStream struct {
 }
 
 // StreamComments streams comments for the last queued object.
+// The fetch interval can be set via reddit.Config.CommentStreamInterval
 // Valid objects: Subreddit, (Redditor)
 func (c *Reddit) StreamComments() (*SubmissionStream, error) {
 	name, ttype := c.getQueue()
@@ -32,6 +33,7 @@ func (c *Reddit) StreamComments() (*SubmissionStream, error) {
 }
 
 // StreamPosts streams posts for the last queued object.
+// The fetch interval can be set via reddit.Config.PostStreamInterval
 // Valid objects: Subreddit, (Redditor)
 func (c *Reddit) StreamPosts() (*SubmissionStream, error) {
 	name, ttype := c.getQueue()
@@ -82,7 +84,7 @@ func (c *Reddit) streamSubredditComments(name string) (*SubmissionStream, error)
 			} else if len(comments) > 2 {
 				last = comments[1].GetID()
 			}
-			time.Sleep(time.Duration(c.Values.CommentStreamInterval) * time.Second)
+			time.Sleep(time.Duration(c.Config.CommentStreamInterval) * time.Second)
 		}
 	}()
 	return s, nil
@@ -125,7 +127,7 @@ func (c *Reddit) streamSubredditPosts(name string) (*SubmissionStream, error) {
 			} else if len(posts) > 2 {
 				last = posts[1].GetID()
 			}
-			time.Sleep(time.Duration(c.Values.SubmissionStreamInterval) * time.Second)
+			time.Sleep(time.Duration(c.Config.PostStreamInterval) * time.Second)
 		}
 	}()
 	return s, nil

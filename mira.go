@@ -5,15 +5,15 @@ package mira
 // LoginAuth() or CodeAuth() afterwards, see the examples there.
 func Init(c Credentials) *Reddit {
 	instance := newOAuthSession(c)
-	instance.Chain = make(chan *chainVals, 32)
+	instance.chain = make(chan *chainVals, 32)
 	instance.SetDefault()
 	return instance
 }
 
 // SetDefault gets sensible default values for streams.
 func (c *Reddit) SetDefault() {
-	c.Values = redditVals{
-		CommentStreamInterval:    45,
-		SubmissionStreamInterval: 45,
+	c.Config = redditConfig{
+		CommentStreamInterval: 45,
+		PostStreamInterval:    45,
 	}
 }

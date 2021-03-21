@@ -39,6 +39,13 @@ type Credentials struct {
 // If you need detailed information, you can do a type assertion:
 //  post, _ := submission.(*miramodels.Post)
 //  fmt.Println("Post Flair Text:", post.LinkFlairText)
+//
+// Reddit.Config object
+//
+// The Reddit.Config controls some internal parameters. Currently, it has two options:
+//  reddit.Config.CommentStreamInterval = 45
+//  reddit.Config.PostStreamInterval    = 45
+// The shown value is the default.
 type Reddit struct {
 	Client      *http.Client
 	creds       Credentials
@@ -47,13 +54,13 @@ type Reddit struct {
 	UserAgent   string
 	ctx         context.Context
 
-	Chain  chan *chainVals
-	Values redditVals
+	chain  chan *chainVals
+	Config redditConfig
 }
 
-type redditVals struct {
-	CommentStreamInterval    int
-	SubmissionStreamInterval int
+type redditConfig struct {
+	CommentStreamInterval int
+	PostStreamInterval    int
 }
 
 type chainVals struct {
