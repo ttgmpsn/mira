@@ -38,7 +38,7 @@ func (r *RedditID) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	return fmt.Errorf("Unknown type for RedditID %v", t)
+	return fmt.Errorf("unknown type for RedditID %v", t)
 }
 
 // Type returns the RedditKind to a RedditID

@@ -139,9 +139,6 @@ func (c *Reddit) SetDefault() {
 // if you want to (you'll most likely want to).
 // Taken from https://github.com/golang/oauth2/issues/84#issuecomment-332517319
 type TokenNotifyFunc func(*oauth2.Token) error
-type contextKey struct{}
-
-var tokenNotifyFuncKey contextKey
 
 // NotifyRefreshTokenSource is essentially oauth2.ResuseTokenSource with TokenNotifyFunc added.
 type NotifyRefreshTokenSource struct {
